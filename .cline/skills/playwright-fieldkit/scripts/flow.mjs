@@ -31,7 +31,7 @@
 //   {"mockAbort":"**/api"} {"auditA11y":"state label"} {"screenshot":"label"}
 
 import { readFileSync } from "node:fs";
-import { launch, gotoSafe } from "./lib/browser.mjs";
+import { launch } from "./lib/browser.mjs";
 import { instrument } from "./lib/instrument.mjs";
 import {
   parseArgs, log, ensureDir, writeJson, writeText, resolveOut, join, truncate,
@@ -39,7 +39,7 @@ import {
 import { generateTestFromFlow, languageFromTestPath } from "./lib/gen-test.mjs";
 import { createScope, installNavigationScope } from "./lib/scope.mjs";
 import { flowAction } from "./lib/flow-actions.mjs";
-import { auditPageState } from "./lib/state-audit.mjs";
+import { runStep } from "./lib/run-step.mjs";
 
 const HELP = `flow.mjs — run a JSON user journey, capture each step, optionally emit a test
 
@@ -50,119 +50,6 @@ const HELP = `flow.mjs — run a JSON user journey, capture each step, optionall
   waits, expectText/expectUrl/expectVisible/expectNotVisible/expectValue/
   expectCount, mockResponse/mockAbort, auditA11y, and screenshots.
   See ../templates/flow.example.json.`;
-
-async function runStep(page, step, ctx) {
-  const action = flowAction(step);
-  const target = step[action];
-  const value = step.value;
-  switch (action) {
-    case "mockResponse": {
-      const status = Number(step.status ?? 200);
-      if (!Number.isInteger(status) || status < 100 || status > 599) throw new Error(`invalid mock status: ${step.status}`);
-      const body = typeof step.body === "string" ? step.body : JSON.stringify(step.body ?? {});
-      await page.route(target, (route) => route.fulfill({
-        status,
-        body,
-        contentType: step.contentType || (typeof step.body === "string" ? "text/plain" : "application/json"),
-        headers: step.headers || {},
-      }));
-      return `mocked ${target} with HTTP ${status}`;
-    }
-    case "mockAbort":
-      await page.route(target, (route) => route.abort(step.errorCode || "failed"));
-      return `aborted requests matching ${target}`;
-    case "goto": {
-      const url = /^https?:/.test(target) ? target : (ctx.baseUrl || "") + target;
-      ctx.scope.assertAllowed(url, "Flow navigation");
-      const nav = await gotoSafe(page, url, { timeout: 30000 });
-      if (!nav.ok) throw new Error(`goto failed: ${nav.error}`);
-      return `navigated to ${url} (${nav.status})`;
-    }
-    case "click":
-      await page.locator(target).first().click({ timeout: 10000 });
-      return `clicked ${target}`;
-    case "fill":
-      await page.locator(target).first().fill(String(value ?? ""), { timeout: 10000 });
-      return `filled ${target}`;
-    case "type":
-      await page.locator(target).first().pressSequentially(String(value ?? ""), { timeout: 10000 });
-      return `typed into ${target}`;
-    case "select":
-      await page.locator(target).first().selectOption(String(value ?? ""), { timeout: 10000 });
-      return `selected ${value} in ${target}`;
-    case "check":
-      await page.locator(target).first().check({ timeout: 10000 });
-      return `checked ${target}`;
-    case "uncheck":
-      await page.locator(target).first().uncheck({ timeout: 10000 });
-      return `unchecked ${target}`;
-    case "press":
-      if (step.selector) await page.locator(step.selector).first().press(target, { timeout: 10000 });
-      else await page.keyboard.press(target);
-      return `pressed ${target}`;
-    case "hover":
-      await page.locator(target).first().hover({ timeout: 10000 });
-      return `hovered ${target}`;
-    case "scrollTo":
-      await page.locator(target).first().scrollIntoViewIfNeeded({ timeout: 10000 });
-      return `scrolled to ${target}`;
-    case "waitFor":
-      await page.locator(target).first().waitFor({ state: "visible", timeout: 15000 });
-      return `saw ${target}`;
-    case "waitForUrl":
-      await page.waitForURL((u) => u.toString().includes(target), { timeout: 15000 });
-      return `url reached ${target}`;
-    case "wait":
-      await page.waitForTimeout(Number(target) || 0);
-      return `waited ${target}ms`;
-    case "expectText": {
-      const found = await page.getByText(target, { exact: false }).first().isVisible({ timeout: 10000 }).catch(() => false);
-      if (!found) throw new Error(`expected text not visible: "${target}"`);
-      return `verified text "${truncate(target, 40)}"`;
-    }
-    case "expectUrl": {
-      const cur = page.url();
-      if (!cur.includes(target)) throw new Error(`expected url to include "${target}" but was ${cur}`);
-      return `verified url contains "${target}"`;
-    }
-    case "expectVisible": {
-      const vis = await page.locator(target).first().isVisible({ timeout: 10000 }).catch(() => false);
-      if (!vis) throw new Error(`expected visible: ${target}`);
-      return `verified ${target} visible`;
-    }
-    case "expectNotVisible": {
-      // Passes if the element is absent or hidden — waits for it to disappear.
-      try {
-        await page.locator(target).first().waitFor({ state: "hidden", timeout: 10000 });
-      } catch {
-        throw new Error(`expected NOT visible, but it is: ${target}`);
-      }
-      return `verified ${target} not visible`;
-    }
-    case "expectValue": {
-      const actual = await page.locator(target).first().inputValue({ timeout: 10000 }).catch(() => null);
-      if (actual !== String(value ?? "")) throw new Error(`expected value "${value}" in ${target} but got "${actual}"`);
-      return `verified value of ${target}`;
-    }
-    case "expectCount": {
-      const n = await page.locator(target).count();
-      if (n !== Number(value)) throw new Error(`expected ${value} matches for ${target} but found ${n}`);
-      return `verified count ${n} for ${target}`;
-    }
-    case "auditA11y": {
-      const issues = await auditPageState(page, Array.isArray(step.allow) ? step.allow : []);
-      if (issues.length) throw new Error(`accessibility audit "${target}" found: ${issues.map((issue) => `${issue.code}${issue.selector ? `@${issue.selector}` : ""}`).join(", ")}`);
-      return `audited accessibility state "${target}"`;
-    }
-    case "screenshot": {
-      const file = `${String(ctx.index).padStart(2, "0")}-${String(target).replace(/[^a-z0-9]+/gi, "-")}.png`;
-      await page.screenshot({ path: join(ctx.outDir, file) }).catch(() => {});
-      return `screenshot ${file}`;
-    }
-    default:
-      throw new Error(`unknown action "${action}" in step ${JSON.stringify(step)}`);
-  }
-}
 
 async function main() {
   const args = parseArgs();

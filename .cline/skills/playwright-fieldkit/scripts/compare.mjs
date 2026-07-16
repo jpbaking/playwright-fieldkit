@@ -91,6 +91,10 @@ function main() {
   }
   const base = loadCrawl(args._[0]);
   const cur = loadCrawl(args._[1]);
+  const originOf = (crawl) => { try { return new URL(crawl.data.startUrl).origin; } catch { return null; } };
+  if (originOf(base) && originOf(cur) && originOf(base) !== originOf(cur)) {
+    log.warn(`Crawl origins differ (${originOf(base)} vs ${originOf(cur)}). Pages are matched by absolute URL, so every page will be reported as new or removed.`);
+  }
   const A = indexPages(base.data);
   const B = indexPages(cur.data);
 

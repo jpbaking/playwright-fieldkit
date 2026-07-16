@@ -16,6 +16,8 @@ import { readFileSync } from "node:fs";
 import { launch, gotoSafe } from "./lib/browser.mjs";
 import { parseArgs, log, ensureDir, writeJson } from "./lib/util.mjs";
 import { createScope, installNavigationScope } from "./lib/scope.mjs";
+import { flowAction } from "./lib/flow-actions.mjs";
+import { runStep } from "./lib/run-step.mjs";
 import { dirname } from "node:path";
 
 async function main() {
@@ -25,10 +27,17 @@ async function main() {
   ensureDir(dirname(out) === "" ? "." : dirname(out));
 
   if (args.flow) {
-    // Scripted login: reuse flow.mjs step semantics inline for the login only.
+    // Scripted login: runs the same step vocabulary as flow.mjs. A step that
+    // fails or is not recognized aborts the run — silently skipping part of a
+    // login flow would save a broken (possibly unauthenticated) state.
     const flow = JSON.parse(readFileSync(args.flow, "utf8"));
-    for (const step of flow.steps || []) {
-      if (Object.keys(step)[0] !== "goto") continue;
+    if (!Array.isArray(flow.steps)) {
+      log.err(`Flow file must have a "steps" array.`);
+      process.exit(1);
+    }
+    for (const step of flow.steps) flowAction(step);
+    for (const step of flow.steps) {
+      if (flowAction(step) !== "goto") continue;
       const target = /^https?:/.test(step.goto) ? step.goto : (flow.baseUrl || "") + step.goto;
       scope.assertAllowed(target, "Authentication flow navigation");
     }
@@ -36,15 +45,10 @@ async function main() {
     await installNavigationScope(context, scope);
     const page = await context.newPage();
     log.info(`Logging in via flow "${flow.name || args.flow}"`);
-    for (const step of flow.steps) {
-      const [action] = Object.keys(step);
-      const t = step[action];
-      if (action === "goto") await gotoSafe(page, /^https?:/.test(t) ? t : (flow.baseUrl || "") + t);
-      else if (action === "click") await page.locator(t).first().click({ timeout: 10000 });
-      else if (action === "fill") await page.locator(t).first().fill(String(step.value ?? ""), { timeout: 10000 });
-      else if (action === "press") await page.keyboard.press(t);
-      else if (action === "waitFor") await page.locator(t).first().waitFor({ state: "visible", timeout: 15000 });
-      else if (action === "wait") await page.waitForTimeout(Number(t) || 0);
+    const flowOutDir = dirname(out) === "" ? "." : dirname(out);
+    for (let i = 0; i < flow.steps.length; i++) {
+      const detail = await runStep(page, flow.steps[i], { baseUrl: flow.baseUrl, outDir: flowOutDir, index: i, scope });
+      log.dim(`  ${i + 1}. ${detail}`);
       await page.waitForTimeout(400);
     }
     await context.storageState({ path: out });

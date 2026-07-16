@@ -11,6 +11,10 @@
     { "expectValue": "#query", "value": "verified" },
     { "expectCount": "#results li", "value": 2 },
     { "expectNotVisible": "#hidden-result" },
-    { "auditA11y": "completed flow", "allow": ["unlabeled-control"] }
+    { "auditA11y": "completed flow", "allow": ["unlabeled-control"] },
+    { "click": "#go-final" },
+    { "waitForUrl": "/final-target.html" },
+    { "expectUrl": "/final-target.html" },
+    { "expectText": "Final target after redirect" }
   ]
 }

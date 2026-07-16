@@ -66,9 +66,12 @@ export async function checkLinks(context, pages, scope, { concurrency = 4, delay
         continue;
       }
       const host = new URL(target.url).host;
-      const wait = Math.max(0, (hostNext.get(host) || 0) - Date.now());
-      if (wait) await sleep(wait);
-      hostNext.set(host, Date.now() + delay);
+      // Reserve the slot before sleeping so concurrent workers can't read the
+      // same window and burst past the per-host delay.
+      const slot = Math.max(hostNext.get(host) || 0, Date.now());
+      hostNext.set(host, slot + delay);
+      const wait = slot - Date.now();
+      if (wait > 0) await sleep(wait);
       results[index] = { ...target, url: redact(target.url), ...(await requestTarget(context, target.url, timeout, scope)) };
     }
   };

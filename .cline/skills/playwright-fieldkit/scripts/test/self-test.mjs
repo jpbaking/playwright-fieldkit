@@ -309,10 +309,11 @@ Allow: /private/public
     await run("flow.mjs", [flowPath, "--wait", "0", "--browser", TEST_BROWSER, "--out", flowDir, "--gen-test", specPath]);
     const flow = readJson(join(flowDir, "flow.json"));
     assert.equal(flow.passed, true);
-    assert.equal(flow.results.length, 10);
+    assert.equal(flow.results.length, 14);
     const spec = readFileSync(specPath, "utf8");
-    for (const expected of ["page.route('**/api/unavailable'", "route.abort('failed')", ".hover()", ".scrollIntoViewIfNeeded()", ".toHaveValue('verified')", ".toHaveCount(2)", ".toBeHidden()", "accessibility state completed flow"])
+    for (const expected of ["page.route('**/api/unavailable'", "route.abort('failed')", ".hover()", ".scrollIntoViewIfNeeded()", ".toHaveValue('verified')", ".toHaveCount(2)", ".toBeHidden()", "accessibility state completed flow", "page.waitForURL(/\\/final-target\\.html/)", "toHaveURL(/\\/final-target\\.html/)"])
       assert(spec.includes(expected), `generated spec omitted ${expected}`);
+    new Function(spec.replace(/^import .*$/m, "let test, expect;")); // regression: URL regexes with slashes must stay syntactically valid
     if (process.env.EXECUTE_GENERATED_TEST === "1") {
       const cli = join(SCRIPTS_DIR, "node_modules", "@playwright", "test", "cli.js");
       symlinkSync(join(SCRIPTS_DIR, "node_modules"), join(workDir, "node_modules"), "dir");
@@ -326,7 +327,7 @@ Allow: /private/public
     const pythonSpecPath = join(pythonFlowDir, "test_generated.py");
     await run("flow.mjs", [flowPath, "--wait", "0", "--browser", TEST_BROWSER, "--out", pythonFlowDir, "--gen-test", pythonSpecPath]);
     const pythonSpec = readFileSync(pythonSpecPath, "utf8");
-    for (const expected of ["from playwright.sync_api import Page, expect", "page.route(\"**/api/unavailable\"", "route.abort(\"failed\")", ".hover()", ".scroll_into_view_if_needed()", ".to_have_value(\"verified\")", ".to_have_count(2)", ".to_be_hidden()", "accessibility state completed flow"])
+    for (const expected of ["from playwright.sync_api import Page, expect", "page.route(\"**/api/unavailable\"", "route.abort(\"failed\")", ".hover()", ".scroll_into_view_if_needed()", ".to_have_value(\"verified\")", ".to_have_count(2)", ".to_be_hidden()", "accessibility state completed flow", "wait_for_url(re.compile(re.escape(\"/final-target.html\")))", "to_have_url(re.compile(re.escape(\"/final-target.html\")))"])
       assert(pythonSpec.includes(expected), `generated Python test omitted ${expected}`);
     if (process.env.EXECUTE_GENERATED_PYTHON_TEST === "1") {
       const python = process.env.PYTHON_EXECUTABLE || "python3";
@@ -334,6 +335,24 @@ Allow: /private/public
       console.log(`✓ generated Python test: executed with pytest-playwright (${TEST_BROWSER})`);
     }
     console.log("✓ flow: extended operations and TypeScript/Python assertions");
+
+    const authFlowPath = join(workDir, "login-flow.json");
+    writeFileSync(authFlowPath, JSON.stringify({ baseUrl: origin, steps: [
+      { goto: "/flow.html" },
+      { fill: "#query", value: "fieldkit" },
+      { expectValue: "#query", value: "fieldkit" },
+    ] }));
+    const authOut = join(workDir, "auth", "auth.json");
+    await run("save-auth.mjs", ["--flow", authFlowPath, "--out", authOut, "--browser", TEST_BROWSER, "--scope-config", scopeConfig]);
+    assert(Array.isArray(readJson(authOut).cookies), "scripted save-auth did not write a storage state");
+    const badAuthFlowPath = join(workDir, "bad-login-flow.json");
+    writeFileSync(badAuthFlowPath, JSON.stringify({ baseUrl: origin, steps: [{ goto: "/flow.html" }, { frobnicate: "#x" }] }));
+    await assert.rejects(
+      run("save-auth.mjs", ["--flow", badAuthFlowPath, "--out", join(workDir, "auth", "bad.json"), "--browser", TEST_BROWSER, "--scope-config", scopeConfig]),
+      /exactly one supported action/,
+      "save-auth did not reject a flow with an unsupported action",
+    );
+    console.log("✓ save-auth: scripted flow runs shared step vocabulary and rejects unknown actions");
 
     variant = "current";
     const currentDir = join(workDir, "current");

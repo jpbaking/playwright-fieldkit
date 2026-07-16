@@ -105,19 +105,24 @@ export function slugifyUrl(url) {
   try {
     const u = new URL(url);
     const path = (u.pathname + u.search).replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "");
-    return (u.hostname + (path ? "-" + path : "-home")).slice(0, 120);
+    const slug = u.hostname + (path ? "-" + path : "-home");
+    if (slug.length <= 120) return slug;
+    // Truncation could collide two long URLs onto one filename; disambiguate.
+    let hash = 0;
+    for (let i = 0; i < url.length; i++) hash = (hash * 31 + url.charCodeAt(i)) >>> 0;
+    return slug.slice(0, 112) + "-" + hash.toString(36);
   } catch {
     return "page-" + Math.random().toString(36).slice(2, 8);
   }
 }
 
-/** Redact obvious secrets before anything is written to disk or shown to a model. */
+/** Redact obvious secrets and email addresses before anything is written to disk or shown to a model. */
 export function redact(text) {
   if (typeof text !== "string") return text;
   return text
     .replace(/([?&](?:token|key|apikey|api_key|access_token|password|secret)=)[^&\s]+/gi, "$1[REDACTED]")
     .replace(/(Bearer\s+)[A-Za-z0-9._~+/-]+=*/g, "$1[REDACTED]")
-    .replace(/([\w.-]+@[\w.-]+\.\w+)/g, (m) => (m.length > 40 ? "[REDACTED]" : m));
+    .replace(/[\w.-]+@[\w.-]+\.\w+/g, "[REDACTED]");
 }
 
 export function ensureDir(dir) {

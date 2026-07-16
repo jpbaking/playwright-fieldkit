@@ -17,7 +17,7 @@ function classify(output) {
   const text = output.toLowerCase();
   if (/strict mode|locator|element.*(?:not found|not visible)|waiting for.*selector/.test(text)) return "locator-or-readiness";
   if (/timeout|timed out|networkidle/.test(text)) return "timing";
-  if (/econn|err_|net::|\b50[0-9]\b|connection|socket|dns/.test(text)) return "network-or-backend";
+  if (/econn|err_|net::|\b50[0-9]\b(?!\s*ms)|connection|socket|dns/.test(text)) return "network-or-backend";
   if (/unique constraint|duplicate key|already exists|test data|fixture/.test(text)) return "shared-test-data";
   if (/browser.*(?:closed|crash)|target closed|out of memory|worker.*exit/.test(text)) return "browser-or-infrastructure";
   if (/expect|assert|expected|actual/.test(text)) return "product-or-assertion";

@@ -7,7 +7,7 @@ import { flowAction } from "./flow-actions.mjs";
 import { STATE_AUDIT_SOURCE } from "./state-audit.mjs";
 
 function tsString(value) {
-  return `'${String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
+  return `'${String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "\\r")}'`;
 }
 
 function pyString(value) {
@@ -16,7 +16,9 @@ function pyString(value) {
 }
 
 function regexText(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // Escapes `/` too: the result is embedded in a /…/ regex literal, where an
+  // unescaped slash would terminate the literal (`//` even starts a comment).
+  return String(value).replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
 }
 
 function screenshotName(value) {

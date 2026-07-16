@@ -510,10 +510,11 @@ flow that ends logged-in, then:
 node .cline/skills/playwright-fieldkit/scripts/save-auth.mjs --flow login.json --out auth.json
 ```
 
-Scripted authentication currently handles only `goto`, `click`, `fill`, `press`,
-`waitFor`, and `wait`. `press` targets the page keyboard rather than a selector.
-Keep authentication flows to that subset; other flow actions are currently
-ignored by `save-auth.mjs`.
+Scripted authentication supports the same step vocabulary as `flow.mjs`,
+including `expect*` steps — end the flow with one (e.g. `expectText` on a
+logged-in element) to prove the login worked. A step that fails or is not
+recognized aborts the run instead of being skipped, so a broken login flow
+cannot silently save an unauthenticated state.
 
 **Then reuse it everywhere:**
 
