@@ -184,6 +184,12 @@ controls, and unnamed visible buttons/links. It also reports pages and captured
 slow requests exceeding `--audit-page-ms` and `--audit-request-ms`. These are
 explainable heuristics, not a full WCAG or laboratory performance audit.
 
+It additionally reports `insecure-redirect`: an HTTPS navigation that reaches its
+destination through a plaintext `http://` hop. Such a chain usually still ends in
+a healthy `200`, so the status alone hides it, and the request is exposed in
+cleartext even though it lands back on HTTPS. Redirect chains are captured on
+every navigation; `--check-links` extends the same check to linked URLs.
+
 **Link checking (`--check-links`).** After the crawl, discovered visible/hidden
 HTTP(S) links and page assets are de-duplicated and checked with `HEAD`, falling
 back to `GET` when `HEAD` is unsupported. The report includes failures, 4xx/5xx
@@ -553,8 +559,8 @@ playwright-report-explore/
 5. **Performance** — average load time, slowest pages, and slow requests (>3s
    documents and XHR/fetch calls).
 6. **Link check** — results when `--check-links` was requested.
-7. **Deterministic quality audit** — accessibility/performance findings with
-   severity, evidence, and remediation.
+7. **Deterministic quality audit** — accessibility, performance, and security
+   findings with severity, evidence, and remediation.
 8. **Suggested next steps.**
 
 **`inspect.md`** leads with status/errors/requests, then a "State" section per

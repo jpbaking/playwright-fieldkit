@@ -3,7 +3,7 @@
 // big JSON — the Markdown surfaces the findings that matter, ranked.
 
 import { truncate } from "./util.mjs";
-import { auditPages } from "./audit.mjs";
+import { auditPages, auditLinkCheck, mergeFindings } from "./audit.mjs";
 
 function severityOf(page) {
   if (page.nav && !page.nav.ok) return "error";
@@ -45,7 +45,10 @@ export function buildReport({ startUrl, pages, queueSeen, startedAt, finishedAt,
   );
   const hiddenNav = pages.flatMap((p) => (p.features?.flags?.hiddenNav || []).map((h) => ({ url: p.url, ...h })));
   const gated = pages.filter((p) => p.features?.flags?.hasLoginForm).map((p) => p.url);
-  const audit = auditPages(pages, { pageLoadMs: config.auditPageMs, slowRequestMs: config.auditRequestMs });
+  const audit = mergeFindings(
+    auditPages(pages, { pageLoadMs: config.auditPageMs, slowRequestMs: config.auditRequestMs }),
+    auditLinkCheck(linkCheck),
+  );
 
   const L = [];
   L.push(`# Site exploration report`);

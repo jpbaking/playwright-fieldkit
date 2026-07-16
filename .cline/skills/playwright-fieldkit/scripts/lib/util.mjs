@@ -121,7 +121,10 @@ export function redact(text) {
   if (typeof text !== "string") return text;
   return text
     .replace(/([?&](?:token|key|apikey|api_key|access_token|password|secret)=)[^&\s]+/gi, "$1[REDACTED]")
-    .replace(/(Bearer\s+)[A-Za-z0-9._~+/-]+=*/g, "$1[REDACTED]")
+    // "Bearer" also occurs in prose ("Bearer tokens are short-lived"), so redact
+    // only a value that looks like a credential rather than a plain short word.
+    .replace(/(Bearer\s+)([A-Za-z0-9._~+/-]+=*)/g, (match, prefix, value) =>
+      /^[A-Za-z]{1,15}$/.test(value) ? match : `${prefix}[REDACTED]`)
     .replace(/[\w.-]+@[\w.-]+\.\w+/g, "[REDACTED]");
 }
 

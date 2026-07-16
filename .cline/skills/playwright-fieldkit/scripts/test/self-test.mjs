@@ -10,6 +10,8 @@ import { fileURLToPath } from "node:url";
 import { parseRobots, robotsMatcher } from "../lib/sitemap.mjs";
 import { createScope } from "../lib/scope.mjs";
 import { languageFromTestPath } from "../lib/gen-test.mjs";
+import { auditPages, auditLinkCheck, insecureHops } from "../lib/audit.mjs";
+import { redact } from "../lib/util.mjs";
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
 const SCRIPTS_DIR = resolve(TEST_DIR, "..");
@@ -123,6 +125,26 @@ Allow: /private/public
   assert(!parsedMatcher("/private/public"), "longest Allow rule did not take precedence");
   const rootMatcher = robotsMatcher(parseRobots("User-agent: *\nDisallow: /", "https://example.test"));
   assert(rootMatcher("/anything"), "site-wide Disallow rule was discarded");
+
+  // A chain that leaves TLS and returns still ends 200, so the status alone hides it.
+  const downgrade = ["https://site.test/blog", "http://site.test:8080/blog/", "https://site.test/blog/"];
+  assert.deepEqual(insecureHops(downgrade), ["http://site.test:8080/blog/"], "plaintext redirect hop was not detected");
+  assert.deepEqual(insecureHops(["https://site.test/a", "https://site.test/a/"]), [], "same-scheme redirect was reported as insecure");
+  assert.deepEqual(insecureHops(["http://site.test/a", "http://site.test/a/"]), [], "plain-HTTP site was reported as a downgrade");
+  const navAudit = auditPages([{ url: "https://site.test/blog", nav: { ok: true, status: 200, ms: 10, redirectChain: downgrade }, features: { lang: "en", headings: [{ level: 1, text: "x" }], landmarks: [{ tag: "main" }] } }], { pageLoadMs: 5000 });
+  const navFinding = navAudit.find((entry) => entry.code === "insecure-redirect");
+  assert(navFinding, "navigation downgrade was not audited");
+  assert.equal(navFinding.severity, "high");
+  assert.equal(navFinding.category, "security");
+  const linkAudit = auditLinkCheck({ results: [{ url: "https://site.test/cv", redirects: [{ to: "http://site.test:8080/cv/" }, { to: "https://site.test/cv/" }] }] });
+  assert.equal(linkAudit.length, 1, "link-check downgrade was not audited");
+  assert.equal(linkAudit[0].code, "insecure-redirect");
+
+  assert.equal(redact("Bearer tokens are expiring, shown once"), "Bearer tokens are expiring, shown once", "redaction mangled ordinary prose after the word Bearer");
+  assert.equal(redact("Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.abc-def"), "Authorization: Bearer [REDACTED]", "a real bearer token was not redacted");
+  assert.equal(redact("Bearer nas_9fk2Lm4xQ7"), "Bearer [REDACTED]", "a token-shaped credential was not redacted");
+  assert.equal(redact("contact ops@example.com"), "contact [REDACTED]", "email was not redacted");
+  console.log("✓ audit units: insecure-redirect detection and bearer/email redaction");
 
   let variant = "baseline";
   let origin = "";
@@ -293,6 +315,15 @@ Allow: /private/public
     assert.equal(inspectedLink.declaredHref, "/declared-target.html");
     assert.equal(inspectedLink.selectorHint, 'a[href="/declared-target.html"]');
     assert.equal(new URL(inspection.states[2].url).pathname, "/final-target.html");
+    const redirectDir = join(workDir, "redirect-chain");
+    await run("inspect.mjs", [`${origin}/declared-target.html`, "--wait", "0", "--no-a11y", "--no-html", "--browser", TEST_BROWSER, "--out", redirectDir]);
+    const redirectNav = readJson(join(redirectDir, "inspect.json")).nav;
+    assert.deepEqual(
+      redirectNav.redirectChain.map((entry) => new URL(entry).pathname),
+      ["/declared-target.html", "/final-target.html"],
+      "navigation redirect chain was not captured",
+    );
+    assert.deepEqual(insecureHops(redirectNav.redirectChain), [], "same-scheme fixture redirect was flagged as insecure");
     const inspectMarkdown = readFileSync(join(inspectDir, "inspect.md"), "utf8");
     assert(inspectMarkdown.includes("Link targets:"), "inspection report omitted link targets");
     assert(inspectMarkdown.includes(`${origin}/final-target.html`), "inspection report omitted the post-redirect URL");

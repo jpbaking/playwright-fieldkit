@@ -6,6 +6,52 @@ function finding(severity, category, code, page, message, observed, remediation)
   return { severity, category, code, url: page.url, message, observed, remediation };
 }
 
+const RANK = { high: 0, medium: 1, low: 2 };
+
+const INSECURE_REDIRECT_FIX =
+  "Keep every redirect hop on the public HTTPS origin. A plaintext hop usually means the origin builds Location from its own host and port; check its X-Forwarded-Proto and X-Forwarded-Host handling.";
+
+/**
+ * Hops that leave TLS. A chain beginning on HTTPS but routing through http://
+ * exposes the request in cleartext even when it lands back on HTTPS, so the
+ * final status alone (often a healthy 200) hides the problem.
+ * @param {string[]} chain URLs oldest first
+ */
+export function insecureHops(chain = []) {
+  if (chain.length < 2 || !/^https:/i.test(chain[0])) return [];
+  return chain.filter((url) => /^http:/i.test(url));
+}
+
+/** Combine finding lists, drop repeats of the same issue, and rank by severity. */
+export function mergeFindings(...lists) {
+  const unique = new Map();
+  for (const item of lists.flat()) {
+    const key = `${item.code}|${item.url}|${item.observed}`;
+    if (!unique.has(key)) unique.set(key, item);
+  }
+  return [...unique.values()].sort((a, b) => RANK[a.severity] - RANK[b.severity] || a.url.localeCompare(b.url));
+}
+
+/** Insecure redirect hops among the links checked by --check-links. */
+export function auditLinkCheck(linkCheck) {
+  const findings = [];
+  for (const item of linkCheck?.results || []) {
+    if (!item.redirects?.length) continue;
+    const chain = [item.url, ...item.redirects.map((hop) => hop.to)];
+    if (!insecureHops(chain).length) continue;
+    findings.push({
+      severity: "high",
+      category: "security",
+      code: "insecure-redirect",
+      url: item.url,
+      message: "Link redirected through a plaintext HTTP hop.",
+      observed: chain.join(" -> "),
+      remediation: INSECURE_REDIRECT_FIX,
+    });
+  }
+  return findings;
+}
+
 export function auditPages(pages, { pageLoadMs = 5000, slowRequestMs = 3000 } = {}) {
   const findings = [];
   for (const page of pages) {
@@ -42,6 +88,10 @@ export function auditPages(pages, { pageLoadMs = 5000, slowRequestMs = 3000 } = 
         "Visible link has no accessible name.", link.selectorHint || link.href, "Add descriptive link text or an accessible name."));
     }
 
+    const chain = page.nav?.redirectChain || [];
+    if (insecureHops(chain).length) findings.push(finding("high", "security", "insecure-redirect", page,
+      "Navigation redirected through a plaintext HTTP hop.", chain.join(" -> "), INSECURE_REDIRECT_FIX));
+
     if (page.nav?.ok && page.nav.ms > pageLoadMs) findings.push(finding("medium", "performance", "slow-page", page,
       "Navigation exceeded the configured page-load threshold.", `${page.nav.ms} ms (threshold ${pageLoadMs} ms)`, "Profile the document and critical rendering path."));
     for (const request of page.signals?.requests || []) {
@@ -50,7 +100,5 @@ export function auditPages(pages, { pageLoadMs = 5000, slowRequestMs = 3000 } = 
         "Profile the endpoint, payload, caching, and request waterfall."));
     }
   }
-  const rank = { high: 0, medium: 1, low: 2 };
-  findings.sort((a, b) => rank[a.severity] - rank[b.severity] || a.url.localeCompare(b.url));
-  return findings;
+  return mergeFindings(findings);
 }

@@ -73,6 +73,19 @@ export async function launch(opts = {}) {
   return { browser, context };
 }
 
+/**
+ * The URL chain the browser actually walked, oldest first, or [] if there was no
+ * redirect. A chain that starts on HTTPS but contains an http:// hop left TLS
+ * mid-navigation — audit.mjs reports that, so capture it on every navigation
+ * rather than only when --check-links is requested.
+ */
+function redirectChainOf(resp) {
+  if (!resp) return [];
+  const chain = [];
+  for (let req = resp.request(); req; req = req.redirectedFrom()) chain.unshift(req.url());
+  return chain.length > 1 ? chain : [];
+}
+
 /** Best-effort navigation that resolves even on partial loads; returns status + timing. */
 export async function gotoSafe(page, url, { waitUntil = "domcontentloaded", timeout = 30000 } = {}) {
   const start = Date.now();
@@ -80,7 +93,7 @@ export async function gotoSafe(page, url, { waitUntil = "domcontentloaded", time
     const resp = await page.goto(url, { waitUntil, timeout });
     // Give client-side rendering a brief settle window without hanging forever.
     await page.waitForLoadState("networkidle", { timeout: 3000 }).catch(() => {});
-    return { ok: true, status: resp ? resp.status() : null, ms: Date.now() - start };
+    return { ok: true, status: resp ? resp.status() : null, ms: Date.now() - start, redirectChain: redirectChainOf(resp) };
   } catch (err) {
     return { ok: false, status: null, ms: Date.now() - start, error: String(err.message || err).split("\n")[0] };
   }
