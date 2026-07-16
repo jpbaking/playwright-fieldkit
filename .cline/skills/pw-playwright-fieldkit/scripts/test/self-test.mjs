@@ -252,6 +252,49 @@ Allow: /private/public
     assert(charter.outcomes.length >= 1, "journey charter omitted outcomes");
     assert.equal(charter.destructive, false);
 
+    const testCaseSource = join(workDir, "test-cases-source.json");
+    const testCaseTemplate = readJson(resolve(SKILL_DIR, "templates", "test-cases.example.json"));
+    writeFileSync(testCaseSource, JSON.stringify(testCaseTemplate));
+    const testCaseDir = join(workDir, "test-cases");
+    await run("test-cases.mjs", [testCaseSource, "--out", testCaseDir]);
+    const testCases = readJson(join(testCaseDir, "test-cases.json"));
+    assert.equal(testCases.requirements.length, 2, "test-case design omitted requirements");
+    assert.equal(testCases.cases.length, 2, "test-case design omitted cases");
+    assert.equal(testCases.review.status, "draft");
+    await assert.rejects(
+      run("test-cases.mjs", [testCaseSource, "--out", join(workDir, "test-cases-blocked"), "--require-approved"]),
+      /must be approved before execution/,
+      "draft specification-derived cases passed the execution approval gate",
+    );
+    const incompleteCases = JSON.parse(JSON.stringify(testCaseTemplate));
+    incompleteCases.cases[0].steps[0].expected = "";
+    incompleteCases.openQuestions = ["What should the first step display?"];
+    const incompleteCaseSource = join(workDir, "test-cases-incomplete.json");
+    const incompleteCaseDir = join(workDir, "test-cases-incomplete");
+    writeFileSync(incompleteCaseSource, JSON.stringify(incompleteCases));
+    await run("test-cases.mjs", [incompleteCaseSource, "--out", incompleteCaseDir]);
+    assert(readJson(join(incompleteCaseDir, "test-cases.json")).warnings.some((warning) => warning.includes("has no expected result")), "incomplete draft did not preserve its expected-result warning");
+    incompleteCases.review.status = "ready-for-approval";
+    writeFileSync(incompleteCaseSource, JSON.stringify(incompleteCases));
+    await assert.rejects(
+      run("test-cases.mjs", [incompleteCaseSource, "--out", join(workDir, "test-cases-not-ready")]),
+      /has no expected result/,
+      "incomplete draft advanced to ready-for-approval",
+    );
+    testCaseTemplate.review = { status: "approved", reviewer: "QE reviewer", notes: ["Approved for execution"] };
+    testCaseTemplate.openQuestions = ["Unresolved business rule"];
+    writeFileSync(testCaseSource, JSON.stringify(testCaseTemplate));
+    await assert.rejects(
+      run("test-cases.mjs", [testCaseSource, "--out", join(workDir, "test-cases-open-question"), "--require-approved"]),
+      /approved test cases cannot contain open questions/,
+      "approval gate allowed an unresolved business question",
+    );
+    testCaseTemplate.openQuestions = [];
+    writeFileSync(testCaseSource, JSON.stringify(testCaseTemplate));
+    const approvedCaseDir = join(workDir, "test-cases-approved");
+    await run("test-cases.mjs", [testCaseSource, "--out", approvedCaseDir, "--require-approved"]);
+    assert.equal(readJson(join(approvedCaseDir, "test-cases.json")).review.status, "approved");
+
     const coverageTest = join(workDir, "test_existing.py");
     writeFileSync(coverageTest, `def test_existing(page):\n    page.goto("/flow.html")\n`);
     const coverageDir = join(workDir, "coverage");
@@ -278,7 +321,7 @@ Allow: /private/public
     const triage = readJson(join(triageDir, "triage.json"));
     assert.equal(triage.status, "flaky", "flake triage did not classify mixed results");
     assert.equal(triage.categories["locator-or-readiness"], 2, "flake triage did not classify locator failures");
-    console.log("✓ QE artifacts: charter, coverage gaps, matrix, and flake triage");
+    console.log("✓ QE artifacts: charter, approved test cases, coverage gaps, matrix, and flake triage");
     assert(baseline.linkCheck.results.some((entry) => entry.url.endsWith("/missing-audit-asset.png") && entry.broken), "broken asset detail was omitted");
     assert(baseline.linkCheck.results.some((entry) => entry.url.endsWith("/head-fallback") && entry.method === "GET" && entry.status === 200), "HEAD-to-GET fallback was not exercised");
     assert(baseline.linkCheck.results.some((entry) => entry.url === "https://example.invalid/outside" && entry.skipped), "out-of-scope external link was not skipped");
@@ -337,10 +380,13 @@ Allow: /private/public
     writeFileSync(flowPath, flowSource);
     const flowDir = join(workDir, "flow");
     const specPath = join(flowDir, "generated.spec.ts");
-    await run("flow.mjs", [flowPath, "--wait", "0", "--browser", TEST_BROWSER, "--out", flowDir, "--gen-test", specPath]);
+    await run("flow.mjs", [flowPath, "--wait", "0", "--browser", TEST_BROWSER, "--out", flowDir, "--trace", "--gen-test", specPath]);
     const flow = readJson(join(flowDir, "flow.json"));
     assert.equal(flow.passed, true);
     assert.equal(flow.results.length, 14);
+    assert.equal(flow.trace, join(flowDir, "trace.zip"));
+    assert(readFileSync(flow.trace).length > 0, "flow trace was empty");
+    assert(readFileSync(join(flowDir, "flow.md"), "utf8").includes("**Playwright trace:**"), "flow report omitted its trace");
     const spec = readFileSync(specPath, "utf8");
     for (const expected of ["page.route('**/api/unavailable'", "route.abort('failed')", ".hover()", ".scrollIntoViewIfNeeded()", ".toHaveValue('verified')", ".toHaveCount(2)", ".toBeHidden()", "accessibility state completed flow", "page.waitForURL(/\\/final-target\\.html/)", "toHaveURL(/\\/final-target\\.html/)"])
       assert(spec.includes(expected), `generated spec omitted ${expected}`);
@@ -365,7 +411,22 @@ Allow: /private/public
       await runCommand(python, ["-m", "pytest", pythonSpecPath, "--base-url", origin, "--browser", TEST_BROWSER], pythonFlowDir);
       console.log(`✓ generated Python test: executed with pytest-playwright (${TEST_BROWSER})`);
     }
-    console.log("✓ flow: extended operations and TypeScript/Python assertions");
+
+    const failedFlowPath = join(workDir, "failed-flow.json");
+    const failedFlowDir = join(workDir, "failed-flow");
+    writeFileSync(failedFlowPath, JSON.stringify({ baseUrl: origin, steps: [
+      { goto: "/flow.html" },
+      { click: "#intentionally-missing" },
+    ] }));
+    await assert.rejects(
+      run("flow.mjs", [failedFlowPath, "--wait", "0", "--timeout", "100", "--browser", TEST_BROWSER, "--out", failedFlowDir, "--trace"]),
+      /exited 1/,
+      "failed flow did not preserve its failing exit",
+    );
+    const failedFlow = readJson(join(failedFlowDir, "flow.json"));
+    assert.equal(failedFlow.passed, false);
+    assert(readFileSync(failedFlow.trace).length > 0, "failed flow did not retain a trace");
+    console.log("✓ flow: trace capture, extended operations, and TypeScript/Python assertions");
 
     const authFlowPath = join(workDir, "login-flow.json");
     writeFileSync(authFlowPath, JSON.stringify({ baseUrl: origin, steps: [
@@ -407,22 +468,42 @@ Allow: /private/public
     console.log("✓ compare: pages, status, errors, forms, and structure");
 
     const rule = readFileSync(resolve(WORKSPACE_ROOT, ".clinerules", "pw-playwright-fieldkit.md"), "utf8");
+    const skillRouter = readFileSync(resolve(SKILL_DIR, "SKILL.md"), "utf8");
     const shortcutDir = resolve(WORKSPACE_ROOT, ".clinerules", "workflows");
     const canonicalWorkflowDir = resolve(SKILL_DIR, "references", "workflows");
     const shortcutNames = readdirSync(shortcutDir).filter((name) => name.endsWith(".md")).sort();
     const debugWorkflow = readFileSync(resolve(SKILL_DIR, "references", "workflows", "pw-debug-site.md"), "utf8");
+    const designTestCasesWorkflow = readFileSync(resolve(SKILL_DIR, "references", "workflows", "pw-design-test-cases.md"), "utf8");
+    const generateWorkflow = readFileSync(resolve(SKILL_DIR, "references", "workflows", "pw-generate-tests.md"), "utf8");
     const recordWorkflow = readFileSync(resolve(SKILL_DIR, "references", "workflows", "pw-record-flow.md"), "utf8");
+    const reviewTestCasesWorkflow = readFileSync(resolve(SKILL_DIR, "references", "workflows", "pw-review-test-cases.md"), "utf8");
+    const executeTestCaseWorkflow = readFileSync(resolve(SKILL_DIR, "references", "workflows", "pw-execute-test-case.md"), "utf8");
+    const runAutomatedTestsWorkflow = readFileSync(resolve(SKILL_DIR, "references", "workflows", "pw-run-automated-tests.md"), "utf8");
+    const playwrightConfigTemplate = readFileSync(resolve(SKILL_DIR, "templates", "playwright.config.ts"), "utf8");
     assert.match(rule, /activate the\s+`pw-playwright-fieldkit` skill/, "always-on rule omitted skill activation");
     assert(rule.includes("do not merely tell the user"), "always-on rule does not require workflow execution");
-    assert.equal(shortcutNames.length, 14, "expected all browser and QE shortcuts");
+    assert(skillRouter.includes("pw-design-test-cases"), "skill router omitted feature-spec test design");
+    assert(skillRouter.includes("pw-review-test-cases"), "skill router omitted test-case review");
+    assert.equal(shortcutNames.length, 18, "expected all browser and QE shortcuts");
     for (const name of shortcutNames) {
       const shortcut = readFileSync(resolve(shortcutDir, name), "utf8");
       readFileSync(resolve(canonicalWorkflowDir, name), "utf8");
       assert(shortcut.includes(`references/workflows/${name}`), `${name} does not route to its canonical workflow`);
     }
     assert(debugWorkflow.includes("Step 2C — If links or navigation targets are wrong"), "canonical debug workflow omitted link-target procedure");
+    assert(designTestCasesWorkflow.includes("Do not open a browser"), "test-case design workflow crossed into execution");
+    assert(generateWorkflow.includes("pw-run-automated-tests.md"), "test generation omitted its permanent-run handoff");
     assert(recordWorkflow.includes("Launch and wait for the user"), "canonical record workflow omitted the interactive handoff");
-    console.log("✓ Cline packaging: skill router, 14 shortcuts, and canonical workflows");
+    assert(recordWorkflow.includes("pw-generate-tests.md"), "recording workflow omitted permanent traced verification");
+    assert(reviewTestCasesWorkflow.includes("--require-approved"), "test-case review workflow omitted the approval gate");
+    assert(executeTestCaseWorkflow.includes("Offer headed or headless execution"), "test-case execution workflow omitted the display-mode choice");
+    assert(executeTestCaseWorkflow.includes("Offer the trace before requesting confirmation"), "test-case execution workflow omitted mandatory trace review");
+    assert(executeTestCaseWorkflow.includes("continue with `pw-generate-tests.md`"), "test-case execution workflow omitted its confirmed generation handoff");
+    assert(runAutomatedTestsWorkflow.includes("--tracing=on"), "automated-test runner omitted Python trace capture");
+    assert(runAutomatedTestsWorkflow.includes("--trace on"), "automated-test runner omitted Node trace capture");
+    assert(runAutomatedTestsWorkflow.includes("does not accept a feature specification"), "automated-test runner omitted its input boundary");
+    assert(playwrightConfigTemplate.includes("trace: 'on'"), "Playwright config template did not retain every permanent-run trace");
+    console.log("✓ Cline packaging: skill router, 18 shortcuts, and canonical workflows");
 
     passed = true;
     console.log("\nAll Playwright FieldKit self-tests passed.");

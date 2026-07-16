@@ -1,6 +1,6 @@
 ---
 name: pw-playwright-fieldkit
-description: Explore, debug, audit, compare, record, and test live websites with deterministic Playwright scripts and QE workflows. Use for requests to map a site, find broken pages or links, reproduce browser bugs, discover hidden or role-gated features, audit accessibility/performance, compare crawls, record a user-demonstrated journey, create test charters, find automation coverage gaps, plan test data or execution matrices, generate negative-path tests, triage flaky tests, save authenticated state, or generate verified Python/Node integration tests.
+description: Explore, debug, audit, compare, record, and test live websites with deterministic Playwright scripts and QE workflows. Use for requests to map a site, find broken pages or links, reproduce browser bugs, discover hidden or role-gated features, audit accessibility/performance, compare crawls, design or review test cases from feature specifications, record a user-demonstrated journey, execute an approved test-case document as a witnessed journey, run existing permanent automated Playwright tests with trace evidence, create test charters, find automation coverage gaps, plan test data or execution matrices, generate negative-path tests, triage flaky tests, save authenticated state, or generate verified Python/Node integration tests.
 ---
 
 # PW Playwright FieldKit
@@ -39,8 +39,16 @@ genuinely crosses intents.
 - Explore, map, health-check, or understand a site: [pw-explore-site](references/workflows/pw-explore-site.md)
 - Reproduce a bug or diagnose wrong navigation: [pw-debug-site](references/workflows/pw-debug-site.md)
 - Find undocumented, authenticated, or role-gated functionality: [pw-discover-features](references/workflows/pw-discover-features.md)
-- Turn a confirmed journey into a verified test: [pw-generate-tests](references/workflows/pw-generate-tests.md)
+- Derive traceable draft test cases from a feature specification:
+  [pw-design-test-cases](references/workflows/pw-design-test-cases.md)
+- Review and explicitly approve specification-derived test cases:
+  [pw-review-test-cases](references/workflows/pw-review-test-cases.md)
+- Turn a confirmed journey into a permanent traced test: [pw-generate-tests](references/workflows/pw-generate-tests.md)
 - Record a journey demonstrated interactively by the user: [pw-record-flow](references/workflows/pw-record-flow.md)
+- Execute an approved test-case document as a journey, capture a trace, and
+  request confirmation: [pw-execute-test-case](references/workflows/pw-execute-test-case.md)
+- Run existing permanent automated tests without changing them and report all
+  traces: [pw-run-automated-tests](references/workflows/pw-run-automated-tests.md)
 - Capture intent, risk, data, outcomes, and cleanup: [pw-create-test-charter](references/workflows/pw-create-test-charter.md)
 - Find crawl routes/forms without test evidence: [pw-analyze-test-coverage](references/workflows/pw-analyze-test-coverage.md)
 - Plan isolated setup and idempotent cleanup: [pw-plan-test-data](references/workflows/pw-plan-test-data.md)
@@ -60,12 +68,15 @@ canonical references.
 - `crawl.mjs`: map reachable same-origin pages, record errors/forms/features,
   audit quality, optionally check links, and checkpoint/resume.
 - `inspect.mjs`: deeply capture one page and optional post-click states.
-- `flow.mjs`: execute a JSON journey and generate a `.py` or `.ts`/`.js` test
-  only after it passes. Inspect the consuming repository's existing tests before
-  choosing the language; ask if its convention is absent or ambiguous.
+- `flow.mjs`: execute a JSON journey, optionally capture a Playwright trace, and
+  generate a `.py` or `.ts`/`.js` test only after it passes. Inspect the
+  consuming repository's existing tests before choosing the language; ask if
+  its convention is absent or ambiguous.
 - `record.mjs`: open headed Playwright Codegen so the user can demonstrate a
   journey; save a language-matched draft for review and verification.
 - `charter.mjs`: validate QE intent/risk/data/cleanup and render `journey.md`.
+- `test-cases.mjs`: validate requirement traceability, test-case structure, and
+  approval status, then render `test-cases.md`.
 - `coverage.mjs`: compare crawl routes/forms with literal test navigation evidence.
 - `matrix.mjs`: run an explicit role/browser/device command matrix without a shell.
 - `triage.mjs`: repeat one test command and classify mixed failure signals.

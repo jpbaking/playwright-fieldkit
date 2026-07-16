@@ -13,6 +13,7 @@
 //   --headed             show the browser
 //   --storage-state <f>  auth state JSON
 //   --device <name>      emulate a device, e.g. "iPhone 13"
+//   --trace [file]       capture a Playwright trace (default <out>/trace.zip)
 //   --gen-test <file>    write a Playwright test; .py selects Python, .ts/.js selects Node
 //   --wait <ms>          settle time after each step        (default 500)
 //   --help
@@ -31,6 +32,7 @@
 //   {"mockAbort":"**/api"} {"auditA11y":"state label"} {"screenshot":"label"}
 
 import { readFileSync } from "node:fs";
+import { dirname } from "node:path";
 import { launch } from "./lib/browser.mjs";
 import { instrument } from "./lib/instrument.mjs";
 import {
@@ -43,7 +45,7 @@ import { runStep } from "./lib/run-step.mjs";
 
 const HELP = `flow.mjs — run a JSON user journey, capture each step, optionally emit a test
 
-  node flow.mjs <flow.json> [--headed] [--storage-state auth.json]
+  node flow.mjs <flow.json> [--headed] [--storage-state auth.json] [--trace]
                 [--gen-test tests/test_flow.py|tests/flow.spec.ts] [--out dir]
 
   Actions include goto/click/fill/type/select/check/press/hover/scrollTo,
@@ -85,6 +87,10 @@ async function main() {
 
   const outDir = resolveOut(args.out || "playwright-report-flow");
   ensureDir(outDir);
+  const tracePath = args.trace
+    ? (args.trace === true ? join(outDir, "trace.zip") : resolveOut(args.trace))
+    : null;
+  if (tracePath) ensureDir(dirname(tracePath));
   const wait = args.wait ?? 500;
   const scope = createScope(args);
   for (const step of flow.steps) {
@@ -96,6 +102,9 @@ async function main() {
 
   log.info(`Running flow "${flow.name || args._[0]}" (${flow.steps.length} steps)`);
   const { browser, context } = await launch({ ...args, storageState: args["storage-state"] || flow.storageState });
+  if (tracePath) {
+    await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
+  }
   await installNavigationScope(context, scope);
   const page = await context.newPage();
   const collector = instrument(page);
@@ -122,12 +131,29 @@ async function main() {
     }
   }
 
+  let savedTracePath = null;
+  if (tracePath) {
+    try {
+      await context.tracing.stop({ path: tracePath });
+      savedTracePath = tracePath;
+      log.ok(`Trace:  ${savedTracePath}`);
+    } catch (error) {
+      log.warn(`Could not save Playwright trace: ${error.message}`);
+    }
+  }
   await browser.close();
 
   const passed = failedAt === -1;
-  const md = buildFlowReport(flow, results, passed, failedAt);
+  const md = buildFlowReport(flow, results, passed, failedAt, savedTracePath);
   const mdPath = writeText(join(outDir, "flow.md"), md);
-  const jsonPath = writeJson(join(outDir, "flow.json"), { flow: flow.name, scope: scope.metadata(), passed, failedAt, results });
+  const jsonPath = writeJson(join(outDir, "flow.json"), {
+    flow: flow.name,
+    scope: scope.metadata(),
+    passed,
+    failedAt,
+    trace: savedTracePath,
+    results,
+  });
 
   if (args["gen-test"]) {
     if (passed) {
@@ -140,12 +166,22 @@ async function main() {
   }
   log[passed ? "ok" : "err"](passed ? `Flow PASSED (${results.length} steps)` : `Flow FAILED at step ${failedAt + 1}`);
   log.ok(`Report: ${mdPath}`);
-  console.log(JSON.stringify({ passed, failedAt: failedAt + 1 || null, steps: results.length, report: mdPath, data: jsonPath }));
+  console.log(JSON.stringify({
+    passed,
+    failedAt: failedAt + 1 || null,
+    steps: results.length,
+    report: mdPath,
+    data: jsonPath,
+    trace: savedTracePath,
+  }));
   process.exit(passed ? 0 : 1);
 }
 
-function buildFlowReport(flow, results, passed, failedAt) {
+function buildFlowReport(flow, results, passed, failedAt, tracePath) {
   const L = [`# Flow: ${flow.name || "(unnamed)"}`, "", `**Result:** ${passed ? "✅ PASSED" : `❌ FAILED at step ${failedAt + 1}`}`, ""];
+  if (tracePath) {
+    L.push(`**Playwright trace:** \`${tracePath}\``, "");
+  }
   L.push(`## Steps`);
   results.forEach((r, i) => {
     L.push(`${i + 1}. ${r.ok ? "✅" : "❌"} \`${JSON.stringify(r.step)}\``);

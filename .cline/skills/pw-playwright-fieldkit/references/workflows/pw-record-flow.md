@@ -76,7 +76,9 @@ what should prove success before writing the permanent test.
 Capture the user's intent, risk, preconditions, outcomes, negative cases, data,
 cleanup, and meaningful variants with the `pw-create-test-charter` workflow. Then
 move/refactor the reviewed draft into the project's normal E2E location and run
-it with the repository's own command. Report the charter, final test file, and
+it with the repository's own command. Follow the permanent-test verification
+contract in `pw-generate-tests.md`: enable tracing for every run, verify that the
+trace archive exists, and report its path with the charter, final test file, and
 verification result. Delete the unreviewed draft after successful integration
 unless the user wants it retained.
 

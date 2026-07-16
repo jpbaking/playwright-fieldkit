@@ -1,13 +1,13 @@
 # /pw-triage-flaky-test — reproduce and classify intermittent failures
 
 Identify the narrowest repository-native command for the suspect test and its
-artifact directory. Ensure the runner records a trace on failure/retry when
-supported. Then repeat without hiding failures:
+artifact directory. Retain a trace for every repeated permanent-test run. Then
+repeat without hiding failures:
 
 ```bash
 node .cline/skills/pw-playwright-fieldkit/scripts/triage.mjs \
   --runs 8 --artifacts test-results --out report/triage -- \
-  pytest tests/e2e/test_checkout.py -k coupon
+  pytest tests/e2e/test_checkout.py -k coupon --tracing=on
 ```
 
 Use a command array after `--`; no shell pipeline is interpreted. Read

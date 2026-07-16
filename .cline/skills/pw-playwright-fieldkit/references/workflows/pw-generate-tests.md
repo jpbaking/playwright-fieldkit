@@ -1,7 +1,14 @@
-# /pw-generate-tests — turn real user journeys into integration tests
+# /pw-generate-tests — turn confirmed journeys into permanent integration tests
 
-Goal: add Playwright tests that match the repository's existing language and
-conventions, and that are known to pass because the journey ran first.
+Goal: add permanent Playwright tests that match the repository's existing
+language and conventions, and verify them with a retained trace after the
+journey ran first.
+
+- [Step 1 — Detect the existing test convention](#step-1--detect-the-existing-test-convention)
+- [Step 2 — Decide what to test](#step-2--decide-what-to-test)
+- [Step 3 — Write each journey as a flow](#step-3--write-each-journey-as-a-flow)
+- [Step 4 — Run the flow and generate the test](#step-4--run-the-flow-and-generate-the-test)
+- [Step 5 — Fit and verify the generated test](#step-5--fit-and-verify-the-generated-test)
 
 If a journey charter exists, treat its outcomes, data lifecycle, cleanup,
 negative cases, and intended matrix as requirements. If it does not exist and
@@ -68,11 +75,11 @@ The output extension selects the generator; there is no language default:
 ```bash
 # Existing Python Playwright/pytest suite
 node .cline/skills/pw-playwright-fieldkit/scripts/flow.mjs login-flow.json --out report/tests \
-     --gen-test tests/e2e/test_login.py
+     --trace --gen-test tests/e2e/test_login.py
 
 # Existing @playwright/test suite
 node .cline/skills/pw-playwright-fieldkit/scripts/flow.mjs login-flow.json --out report/tests \
-     --gen-test tests/login.spec.ts
+     --trace --gen-test tests/login.spec.ts
 ```
 
 Use `.py` for Python or `.ts`/`.js` for `@playwright/test`. An unrecognized
@@ -85,13 +92,12 @@ Refactor the generated file to use the suite's existing fixtures, page objects,
 authentication, markers, and configuration without weakening its outcome
 assertions. Keep credentials and test data out of committed tests.
 
-Run it through the repository's own test command. Typical examples are:
+Then read and follow `pw-run-automated-tests.md` with the generated test path as
+the selected scope. That workflow owns repository-native execution,
+headed/headless selection, unique artifact paths, mandatory traces for every
+test, evidence validation, and the run report.
 
-```bash
-pytest tests/e2e/test_login.py
-npx playwright test tests/login.spec.ts
-```
-
-Report the files added, the verification command and result, and meaningful
-coverage still missing. Never run destructive purchase/delete/send journeys
-against production.
+Do not call generation complete until the permanent automated test has been run
+and its trace evidence is complete. Report the files added, automated-test run
+result and trace paths, and meaningful coverage still missing. Never run
+destructive purchase/delete/send journeys against production.

@@ -1,0 +1,95 @@
+{
+  "feature": {
+    "title": "Coupon application",
+    "source": "docs/features/coupons.md",
+    "version": "2026-07-17",
+    "summary": "Eligible returning customers can apply one coupon to a cart."
+  },
+  "requirements": [
+    {
+      "id": "REQ-COUPON-1",
+      "text": "A valid coupon reduces the eligible cart total.",
+      "sourceRef": "Valid coupon behavior",
+      "risk": "critical"
+    },
+    {
+      "id": "REQ-COUPON-2",
+      "text": "An invalid coupon does not change the cart total.",
+      "sourceRef": "Validation errors",
+      "risk": "high"
+    }
+  ],
+  "assumptions": [
+    "The staging coupon SAVE10 is reserved for automated testing."
+  ],
+  "openQuestions": [],
+  "cases": [
+    {
+      "id": "TC-COUPON-001",
+      "title": "Returning customer applies a valid coupon",
+      "requirementIds": ["REQ-COUPON-1"],
+      "type": "positive",
+      "priority": "critical",
+      "persona": "authenticated returning customer",
+      "preconditions": [
+        "The cart contains one coupon-eligible in-stock item."
+      ],
+      "testData": [
+        "Unique cart owned by this test run",
+        "Active coupon SAVE10"
+      ],
+      "steps": [
+        {
+          "action": "Open the cart and record the original total.",
+          "expected": "The cart shows the eligible item and original total."
+        },
+        {
+          "action": "Enter SAVE10 and select Apply.",
+          "expected": "The coupon is shown as applied and the total is reduced according to the documented rule."
+        }
+      ],
+      "destructive": false,
+      "cleanup": [
+        "Delete the unique test cart through the existing test-data fixture."
+      ],
+      "automationCandidate": true,
+      "notes": []
+    },
+    {
+      "id": "TC-COUPON-002",
+      "title": "Invalid coupon leaves the cart total unchanged",
+      "requirementIds": ["REQ-COUPON-2"],
+      "type": "negative",
+      "priority": "high",
+      "persona": "authenticated returning customer",
+      "preconditions": [
+        "The cart contains one coupon-eligible in-stock item."
+      ],
+      "testData": [
+        "Unique cart owned by this test run",
+        "Invalid coupon NOT-A-COUPON"
+      ],
+      "steps": [
+        {
+          "action": "Open the cart and record the original total.",
+          "expected": "The cart shows the eligible item and original total."
+        },
+        {
+          "action": "Enter NOT-A-COUPON and select Apply.",
+          "expected": "A validation error appears and the original total remains unchanged."
+        }
+      ],
+      "destructive": false,
+      "cleanup": [
+        "Delete the unique test cart through the existing test-data fixture."
+      ],
+      "automationCandidate": true,
+      "notes": []
+    }
+  ],
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "notes": []
+  }
+}

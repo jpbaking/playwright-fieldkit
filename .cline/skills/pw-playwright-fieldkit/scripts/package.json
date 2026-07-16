@@ -8,6 +8,7 @@
   "bin": {
     "pw-crawl": "./crawl.mjs",
     "pw-charter": "./charter.mjs",
+    "pw-test-cases": "./test-cases.mjs",
     "pw-coverage": "./coverage.mjs",
     "pw-inspect": "./inspect.mjs",
     "pw-flow": "./flow.mjs",
@@ -23,6 +24,7 @@
     "test:generated:python": "EXECUTE_GENERATED_PYTHON_TEST=1 node test/self-test.mjs",
     "crawl": "node crawl.mjs",
     "charter": "node charter.mjs",
+    "test-cases": "node test-cases.mjs",
     "coverage": "node coverage.mjs",
     "inspect": "node inspect.mjs",
     "flow": "node flow.mjs",

@@ -1,7 +1,9 @@
 # PW Playwright FieldKit intent router
 
 When the user asks to explore, test, debug, audit, compare, record, demonstrate,
-plan test data/matrices, analyze coverage, generate negative paths, create a test
+design or review test cases from a feature specification, execute an approved
+test-case document as a journey, run existing permanent automated tests, plan
+test data/matrices, analyze coverage, generate negative paths, create a test
 charter, triage a flaky test, or understand a live website, activate the
 `pw-playwright-fieldkit` skill. If
 automatic skill activation is unavailable or missed, read and follow

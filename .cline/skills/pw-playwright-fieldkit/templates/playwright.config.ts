@@ -11,7 +11,7 @@ export default defineConfig({
   use: {
     // Point every test at your app; goto('/path') resolves against this.
     baseURL: process.env.BASE_URL || 'http://localhost:3000',
-    trace: 'on-first-retry',   // rich debugging artifact when a test fails
+    trace: 'on',               // retain evidence for every permanent test run
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
