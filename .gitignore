@@ -1,0 +1,31 @@
+# Playwright runtime + exploration output — never commit these.
+# (Keep .cline/skills/playwright-fieldkit/scripts/package-lock.json tracked for reproducible installs.)
+node_modules/
+.cline/skills/playwright-fieldkit/scripts/node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Exploration artifacts (regenerated on every run)
+playwright-report-explore/
+playwright-report-inspect/
+playwright-report-flow/
+playwright-report-compare/
+report/journey/
+report/coverage/
+report/matrix/
+report/triage/
+report/recording/
+playwright-report/
+blob-report/
+test-results/
+*.har
+**/screenshots/
+**/.crawl-state.json
+
+# Saved login sessions — SECRET. Contains cookies/tokens.
+auth.json
+*.auth.json
+auth.json.meta.json
+*.auth.json.meta.json

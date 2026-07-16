@@ -1,0 +1,38 @@
+{
+  "title": "Returning customer applies a coupon",
+  "intent": "Prove that a valid coupon changes the cart total and persists after reopening the cart.",
+  "risk": "Customers may be charged the undiscounted amount.",
+  "persona": "authenticated returning customer",
+  "startUrl": "https://staging.example.com/cart",
+  "preconditions": [
+    "A reusable test customer exists",
+    "The cart contains one in-stock product",
+    "Coupon SAVE10 is active"
+  ],
+  "outcomes": [
+    "The coupon is shown as applied",
+    "The displayed total includes the discount",
+    "The discounted total persists after reopening the cart"
+  ],
+  "negativeCases": [
+    "Expired coupon is rejected without changing the total",
+    "Coupon API failure leaves the original total and shows a recoverable error"
+  ],
+  "destructive": false,
+  "testData": {
+    "strategy": "unique cart per test run",
+    "notes": ["Create the cart through the project's API fixture"]
+  },
+  "cleanup": ["Delete the test cart through the API fixture"],
+  "tags": ["checkout", "regression", "coupon"],
+  "matrix": [
+    { "role": "customer", "browser": "chromium", "device": "desktop" }
+  ],
+  "recording": "report/recording/test_coupon.py",
+  "flow": "tests/flows/coupon.json",
+  "automation": {
+    "language": "python",
+    "runner": "pytest-playwright",
+    "testPath": "tests/e2e/test_coupon.py"
+  }
+}

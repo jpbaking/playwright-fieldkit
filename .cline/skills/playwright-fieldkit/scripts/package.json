@@ -1,0 +1,42 @@
+{
+  "name": "playwright-fieldkit-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Playwright FieldKit runtime for browser exploration, QE planning, test generation, and test diagnosis.",
+  "bin": {
+    "pw-crawl": "./crawl.mjs",
+    "pw-charter": "./charter.mjs",
+    "pw-coverage": "./coverage.mjs",
+    "pw-inspect": "./inspect.mjs",
+    "pw-flow": "./flow.mjs",
+    "pw-matrix": "./matrix.mjs",
+    "pw-record": "./record.mjs",
+    "pw-compare": "./compare.mjs",
+    "pw-save-auth": "./save-auth.mjs",
+    "pw-triage": "./triage.mjs"
+  },
+  "scripts": {
+    "test": "node test/self-test.mjs",
+    "test:generated": "EXECUTE_GENERATED_TEST=1 node test/self-test.mjs",
+    "test:generated:python": "EXECUTE_GENERATED_PYTHON_TEST=1 node test/self-test.mjs",
+    "crawl": "node crawl.mjs",
+    "charter": "node charter.mjs",
+    "coverage": "node coverage.mjs",
+    "inspect": "node inspect.mjs",
+    "flow": "node flow.mjs",
+    "matrix": "node matrix.mjs",
+    "record": "node record.mjs",
+    "compare": "node compare.mjs",
+    "save-auth": "node save-auth.mjs",
+    "triage": "node triage.mjs",
+    "help": "node crawl.mjs --help"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "playwright": ">=1.40.0"
+  }
+}

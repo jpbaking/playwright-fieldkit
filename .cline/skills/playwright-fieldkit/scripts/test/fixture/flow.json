@@ -1,0 +1,16 @@
+{
+  "name": "extended flow operations",
+  "baseUrl": "{{ORIGIN}}",
+  "steps": [
+    { "status": 503, "body": { "error": "temporarily unavailable" }, "mockResponse": "**/api/unavailable" },
+    { "mockAbort": "**/api/disconnected", "errorCode": "failed" },
+    { "goto": "/flow.html" },
+    { "hover": "#hover-target" },
+    { "scrollTo": "#bottom" },
+    { "fill": "#query", "value": "verified" },
+    { "expectValue": "#query", "value": "verified" },
+    { "expectCount": "#results li", "value": 2 },
+    { "expectNotVisible": "#hidden-result" },
+    { "auditA11y": "completed flow", "allow": ["unlabeled-control"] }
+  ]
+}
