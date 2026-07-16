@@ -1,5 +1,8 @@
 # Troubleshooting
 
+For workflow selection and beginner terminology, return to the
+[User Guide](../user-guide.md).
+
 Quick fixes for the things that actually go wrong.
 
 ## Setup
@@ -60,7 +63,7 @@ configuration, or leave the skip recorded in the report.
 
 **Everything redirects to the login page.**
 You need a session. See
-[Authentication](user-guide.md#authentication): run `save-auth.mjs`, then pass
+[Authentication](../reference/cli.md#authentication): run `save-auth.mjs`, then pass
 `--storage-state auth.json`.
 
 ## Inspect

@@ -10,7 +10,7 @@
 //     node save-auth.mjs --flow login.json --out auth.json
 //
 // The saved auth.json contains cookies and localStorage. Treat it like a
-// password — never commit it. See ../docs/user-guide.md#authentication.
+// password — never commit it. See docs/reference/cli.md#authentication.
 
 import { readFileSync } from "node:fs";
 import { launch, gotoSafe } from "./lib/browser.mjs";

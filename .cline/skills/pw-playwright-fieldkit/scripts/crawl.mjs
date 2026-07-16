@@ -33,7 +33,7 @@
 //   --timeout <ms>       per-navigation timeout                   (default 30000)
 //   --help
 //
-// See ../docs/user-guide.md for full documentation.
+// See docs/reference/cli.md from the project root for full CLI documentation.
 
 import { launch, gotoSafe } from "./lib/browser.mjs";
 import { instrument } from "./lib/instrument.mjs";

@@ -25,8 +25,8 @@ their native runners.
 - Preserve `.cline/skills/pw-playwright-fieldkit/` as the canonical package.
 - Keep `.clinerules/workflows/` as thin shortcuts to canonical playbooks.
 - Add or update deterministic self-tests for behavioral changes.
-- Update the Coder, QA/QE, installation, troubleshooting, or harness guide when
-  user-visible behavior changes.
+- Update the User Guide and the affected focused QE, setup, or reference guide
+  when user-visible behavior changes.
 - Do not include real credentials, auth state, HAR files, recordings, target
   reports, or private application details.
 - Keep unrelated formatting or generated artifacts out of the change.

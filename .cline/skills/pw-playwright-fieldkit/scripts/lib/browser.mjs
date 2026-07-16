@@ -9,7 +9,7 @@ import { log } from "./util.mjs";
  * @param {object} opts
  * @param {string}  [opts.browser]   chromium | firefox | webkit
  * @param {boolean} [opts.headed]    show the browser window
- * @param {string}  [opts.storageState] path to a saved auth state JSON (see docs/user-guide.md#authentication)
+ * @param {string}  [opts.storageState] path to a saved auth state JSON (see docs/reference/cli.md#authentication)
  * @param {number}  [opts.width]
  * @param {number}  [opts.height]
  * @param {number}  [opts.timeout]   per-action timeout in ms

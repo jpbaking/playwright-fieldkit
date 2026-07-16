@@ -1,4 +1,6 @@
-# Using Playwright FieldKit with Other Agent Harnesses
+# Agent Harness Guide
+
+For workflow selection, return to the [User Guide](../user-guide.md).
 
 Playwright FieldKit is packaged for Cline first, but its browser runtime,
 templates, and workflow playbooks do not call Cline APIs. Any coding-agent
@@ -45,8 +47,9 @@ npm test
 ```
 
 No browser MCP server, web-search capability, or model-specific API is required.
-`/pw-record-flow` is the exception to headless operation: recording needs a visible
-desktop, display forwarding, or VNC so the user can control Codegen.
+`/pw-record-flow` always needs a visible desktop, display forwarding, or VNC so
+the user can control Codegen. `/pw-execute-test-case` offers headed observation or
+headless execution; both modes capture a trace for review.
 
 ## Integration pattern A: a repository instruction
 
@@ -68,9 +71,10 @@ procedures belong in the canonical workflow files.
 
 If the harness discovers skills from its own directory, create a small native
 adapter that points to the canonical package. Its description should cover live
-site exploration, browser debugging, journey recording, test generation, QE
-charters, coverage gaps, negative paths, matrices, accessibility states, and
-flake triage. Its body only needs to say:
+site exploration, browser debugging, specification-derived test-case design and
+approval, journey recording, existing test-case execution and trace review,
+test generation, QE charters, coverage gaps, negative paths, matrices,
+accessibility states, and flake triage. Its body only needs to say:
 
 ```markdown
 Read and follow `.cline/skills/pw-playwright-fieldkit/SKILL.md`. Treat its linked
@@ -91,7 +95,11 @@ canonical file. For example:
 | Shortcut | Canonical workflow |
 |---|---|
 | `pw-explore-site` | `references/workflows/pw-explore-site.md` |
+| `pw-design-test-cases` | `references/workflows/pw-design-test-cases.md` |
+| `pw-review-test-cases` | `references/workflows/pw-review-test-cases.md` |
 | `pw-record-flow` | `references/workflows/pw-record-flow.md` |
+| `pw-execute-test-case` | `references/workflows/pw-execute-test-case.md` |
+| `pw-run-automated-tests` | `references/workflows/pw-run-automated-tests.md` |
 | `pw-create-test-charter` | `references/workflows/pw-create-test-charter.md` |
 | `pw-analyze-test-coverage` | `references/workflows/pw-analyze-test-coverage.md` |
 | `pw-generate-negative-tests` | `references/workflows/pw-generate-negative-tests.md` |
@@ -110,8 +118,9 @@ it a direct prompt:
 > at `https://…` and report what is broken.
 
 For non-agent use, run the same CLI tools directly and read their Markdown
-reports. The [Coder Guide](user-guide.md) documents every command and flow
-action; the [QA/QE Guide](qa-qe-guide.md) organizes them around test-design work.
+reports. The [CLI Reference](../reference/cli.md) documents every command and
+flow action; the [User Guide](../user-guide.md) routes each workflow set to a
+focused guide.
 
 ## Expected agent behavior
 
@@ -124,6 +133,10 @@ Regardless of harness, the adapter should preserve these rules:
 5. Keep charters, data ownership, cleanup, and meaningful outcomes with the test.
 6. Treat auth state, recordings, HAR files, and reports as potentially sensitive.
 7. Stay within the configured authorization scope.
+8. For a supplied test case, offer headed or headless execution, retain a trace
+   in either mode, and request the user's confirmation only after trace review.
+9. Route feature specifications through test-case design and explicit approval;
+   do not treat them as executable cases or generate automation directly.
 
 ## Portability smoke test
 
@@ -136,3 +149,18 @@ A correctly integrated agent should find `SKILL.md`, select `pw-record-flow.md`,
 mention the headed browser/user handoff, and recognize that intent and outcome
 must be captured after recording. Then run `npm test` to validate the portable
 runtime independently of the agent integration.
+
+To smoke-test document-driven execution separately, ask which workflow would run
+an existing test case in headed or headless mode. The agent should select
+`pw-execute-test-case.md`, require a trace in either mode, and withhold confirmation
+until the user reviews the execution.
+
+To smoke-test permanent automation separately, provide an existing Playwright
+test path and ask only to run it. The agent should select
+`pw-run-automated-tests.md`, leave the test code unchanged, force traces for all
+selected tests, and report the runner result and trace paths.
+
+To smoke-test specification routing, provide a short feature specification and
+ask for tests. The agent should select `pw-design-test-cases.md`, produce draft
+traceability artifacts, require `pw-review-test-cases.md` and explicit approval,
+and avoid opening a browser or generating permanent code at that stage.

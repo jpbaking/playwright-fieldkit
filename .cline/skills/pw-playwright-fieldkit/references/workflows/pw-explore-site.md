@@ -22,7 +22,8 @@ node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 
   `<a href>`) are discovered too.
 - To audit the **mobile** experience, add `--device "iPhone 13"`.
 - If the interesting pages are behind a login, first run `/pw-explore-site` after
-  `save-auth.mjs` (see the authentication section of docs/user-guide.md) and add
+  `save-auth.mjs` (see the authentication section of
+  `docs/reference/cli.md`) and add
   `--storage-state auth.json`.
 
 The crawl automatically seeds from `robots.txt` and `sitemap.xml` (unlinked

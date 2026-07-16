@@ -1,5 +1,8 @@
 # Installation
 
+For the agent-guided workflow selection, return to the
+[User Guide](../user-guide.md).
+
 ## Requirements
 
 - **Node.js 18 or newer** (`node --version`).
@@ -56,7 +59,7 @@ For a Python pytest suite:
 cd /path/to/your/app
 python -m pip install pytest pytest-playwright
 python -m playwright install chromium
-pytest tests/e2e/test_generated.py
+pytest tests/e2e/test_generated.py --tracing=on
 ```
 
 For an `@playwright/test` suite:
@@ -66,7 +69,7 @@ cd /path/to/your/app
 npm install -D @playwright/test
 npx playwright install chromium
 # copy .cline/skills/pw-playwright-fieldkit/templates/playwright.config.ts to your project root, set baseURL
-npx playwright test
+npx playwright test --trace on
 ```
 
 ## CI (GitHub Actions example)

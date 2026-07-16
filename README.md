@@ -12,11 +12,12 @@ uncover hidden features, and write integration tests that actually pass.
 
 Cline gets first-class skill activation and shortcut packaging, but the core is
 ordinary Node.js plus Markdown playbooks. Other terminal-capable agent harnesses
-can use the same canonical package through a thin adapter; see the
-[agent-harness guide](docs/agent-harness-guide.md).
+can use the same canonical package through a thin adapter; start with the
+[User Guide](docs/user-guide.md) for the supported setup paths and workflows.
 
-No screen-watching. No brittle hand-written automation. No web access required
-for the model — just a browser and a plan.
+Run unattended or watch the agent execute a supplied test case in a headed
+browser. No brittle hand-written automation or model web access is required—just
+a browser and a plan.
 
 ---
 
@@ -44,7 +45,10 @@ thinking.
 | 🔗 **Checks links on demand** | `--check-links` verifies discovered internal/external links and assets with bounded, rate-limited requests, including redirect chains and source pages. |
 | 🔍 **Uncovers hidden features** | Flags beta flags, gated routes, admin tools, `robots` Disallow paths, and links the UI hides — logged out *and* logged in. |
 | 🎬 **Records your journey** | Opens a visible browser so you can demonstrate a flow, then lets the agent review, explain, and integrate the generated test. |
-| ✅ **Writes real tests** | Turns user journeys into verified Python or TypeScript/JavaScript Playwright tests, following the repository's existing convention. |
+| 📝 **Designs test cases from feature specs** | Extracts traceable requirements, drafts risk-based cases, and enforces separate QE review and approval before execution. |
+| 👀 **Executes approved test-case documents** | `/pw-execute-test-case` translates one approved case into a headed or headless journey, captures a trace, and asks you to confirm the execution. |
+| ▶️ **Runs permanent automated tests** | `/pw-run-automated-tests` runs existing Python or TypeScript/JavaScript test code unchanged and reports every result with mandatory traces. |
+| ✅ **Writes real tests** | `/pw-generate-tests` turns confirmed journeys into permanent test code, then hands it to the automated-test runner for traced verification. |
 | 🧭 **Preserves QE intent** | Turns journey intent, risk, data, outcomes, variants, and cleanup into a validated charter before replay code becomes the specification. |
 | 🧩 **Finds automation gaps** | Compares crawled routes and forms with literal navigation found in existing Python or Node tests for review and prioritization. |
 | 🧪 **Exercises failure states** | Adds deterministic response/network mocks and accessibility checks at meaningful interactive states, then emits them into generated tests. |
@@ -107,21 +111,25 @@ available as explicit shortcuts:
 - *"Explore my site at localhost:3000 and tell me what's broken"* → `/pw-explore-site`
 - *"The save button throws an error, debug it"* → `/pw-debug-site`
 - *"What features does this app have that aren't documented?"* → `/pw-discover-features`
+- *"Design test cases from this feature specification"* → `/pw-design-test-cases`
+- *"Review these cases against the specification"* → `/pw-review-test-cases`
 - *"Write integration tests for the login and search flows"* → `/pw-generate-tests`
 - *"Let me demonstrate the checkout flow in a browser"* → `/pw-record-flow`
+- *"Execute this approved test case and let me review the trace"* → `/pw-execute-test-case`
+- *"Run these generated Playwright tests and report every trace"* → `/pw-run-automated-tests`
 - *"Audit the site and tell me what to improve"* → `/pw-recommend-improvements`
 - *"Did my last deploy change or break anything?"* → `/pw-compare-runs`
 
 Quality engineers can also use explicit shortcuts for charters, coverage gaps,
 test data, negative paths, interactive accessibility, risk-based matrices, and
-flake triage. The [QA/QE Guide](docs/qa-qe-guide.md) starts with the
-non-technical “demonstrate, then explain” workflow.
+flake triage. The [User Guide](docs/user-guide.md) routes beginners to a focused
+guide for each workflow set.
 
 Using another coding-agent harness? Keep the canonical skill at
 `.cline/skills/pw-playwright-fieldkit/` and point that harness's repository rule or
 native skill adapter at its `SKILL.md`. The
-[agent-harness guide](docs/agent-harness-guide.md) includes a portable adapter
-prompt, shortcut mapping, capability requirements, and a smoke test.
+[User Guide](docs/user-guide.md) links to the portable adapter prompt, shortcut
+mapping, capability requirements, and smoke test.
 
 ---
 
@@ -139,13 +147,18 @@ pw-playwright-fieldkit/
 │   │   ├── compare.mjs
 │   │   ├── save-auth.mjs
 │   │   ├── charter.mjs
+│   │   ├── test-cases.mjs
 │   │   ├── coverage.mjs
 │   │   ├── matrix.mjs
 │   │   └── triage.mjs
 │   ├── templates/           # Flow, charter, matrix, data, spec, and page-object scaffolds
 │   └── references/workflows/ # Detailed workflow playbooks
 ├── .clinerules/             # Always-on activation rule + browser/QE shortcuts
-└── docs/                    # Coder guide, QA/QE guide, install, troubleshooting, roadmap
+└── docs/
+    ├── user-guide.md        # Single product and workflow entry point
+    ├── qe/                  # Focused QE workflow-set guides
+    ├── setup/               # Installation, harness, and troubleshooting
+    └── reference/           # CLI and future-work references
 ```
 
 ---
@@ -181,12 +194,9 @@ Run the bundled localhost regression suite with `cd .cline/skills/pw-playwright-
 
 ## Documentation
 
-- 🧑‍💻 **[Coder Guide](docs/user-guide.md)** — CLI tools, options, flow format, and examples
-- 🧪 **[QA/QE Guide](docs/qa-qe-guide.md)** — demonstrate journeys, design coverage, data, variants, failure states, and flake triage
-- 🔌 **[Agent Harness Guide](docs/agent-harness-guide.md)** — use the same skill, scripts, and playbooks outside Cline
-- ⚙️ **[Installation](docs/installation.md)** — setup, CI, Docker
-- 🧯 **[Troubleshooting](docs/troubleshooting.md)** — when a crawl misbehaves
-- 🗺️ **[Future work](docs/future-work.md)** — unimplemented candidates under consideration
+**[User Guide](docs/user-guide.md)** is the single product entry point. It maps
+your goal to an agentic workflow and links the focused QE, setup,
+troubleshooting, harness, CLI, and future-work documentation.
 
 ## License
 

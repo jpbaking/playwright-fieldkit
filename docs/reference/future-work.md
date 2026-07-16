@@ -1,5 +1,8 @@
 # Future work
 
+For currently supported workflows, start with the
+[User Guide](../user-guide.md).
+
 Only unimplemented candidates are listed here. These are ideas, not committed
 release promises.
 
@@ -98,4 +101,5 @@ Before implementation, define:
   one: the coercion runs after the `=` split, so `--exclude=0` still yields `0`.
   It does already handle values beginning with `--`, giving `--include=--foo`
   the string `"--foo"`;
-- backward compatibility for invocations documented in `docs/user-guide.md`.
+- backward compatibility for invocations documented in
+  `docs/reference/cli.md`.
