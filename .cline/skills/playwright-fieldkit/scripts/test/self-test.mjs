@@ -191,7 +191,7 @@ Allow: /private/public
       "authorization allowlist did not reject an unrelated host",
     );
     const scopeRedirectDir = join(workDir, "scope-redirect");
-    await run("inspect.mjs", [`${origin}/external-redirect`, "--scope-config", scopeConfig, "--wait", "0", "--no-a11y", "--no-html", "--out", scopeRedirectDir]);
+    await run("inspect.mjs", [`${origin}/external-redirect`, "--scope-config", scopeConfig, "--wait", "0", "--no-a11y", "--no-html", "--browser", TEST_BROWSER, "--out", scopeRedirectDir]);
     assert.equal(readJson(join(scopeRedirectDir, "inspect.json")).nav.ok, false, "navigation guard allowed a redirect outside the scope");
 
     const baselineDir = join(workDir, "baseline");
@@ -266,7 +266,7 @@ Allow: /private/public
     console.log("✓ crawl: links, sitemap, robots, delay, and console findings");
 
     const resumeDir = join(workDir, "resume");
-    const resumeArgs = [origin, "--depth", "1", "--max-pages", "2", "--no-sitemap", "--no-screenshots", "--checkpoint-every", "1", "--out", resumeDir];
+    const resumeArgs = [origin, "--depth", "1", "--max-pages", "2", "--no-sitemap", "--no-screenshots", "--checkpoint-every", "1", "--browser", TEST_BROWSER, "--out", resumeDir];
     await runAndInterrupt("crawl.mjs", resumeArgs, `d0 ${origin}`);
     assert.equal(readJson(join(resumeDir, ".crawl-state.json")).version, 1, "interrupted crawl did not write a checkpoint");
     await run("crawl.mjs", [...resumeArgs, "--resume"]);
