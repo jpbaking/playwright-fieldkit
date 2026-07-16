@@ -58,11 +58,11 @@ thinking.
 ## See it in action
 
 ```console
-$ node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://quotes.toscrape.com --depth 1 --max-pages 8 --out report/explore
+$ node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://quotes.toscrape.com --depth 1 --max-pages 8 --out report/explore
 
 i Crawling https://quotes.toscrape.com/ (depth 1, max 8 pages, chromium)
 ✓ Visited 8 pages. 0 pages with errors, 1 forms.
-✓ Report:  /…/playwright-fieldkit/report/explore/report.md
+✓ Report:  /…/pw-playwright-fieldkit/report/explore/report.md
 ```
 
 ```markdown
@@ -76,41 +76,41 @@ _No console errors, failed requests, or bad status codes observed._
 ```
 
 From there the model can say: *"Found a login form at `/login`. Want me to turn
-it into a test?"* — and `/generate-tests` writes a passing test in the
+it into a test?"* — and `/pw-generate-tests` writes a passing test in the
 project's existing language.
 
 ---
 
 ## Quick start
 
-Copy `.cline/skills/playwright-fieldkit/` into the same path in your project.
+Copy `.cline/skills/pw-playwright-fieldkit/` into the same path in your project.
 For Cline's activation fallback and shortcuts, also merge
-`.clinerules/playwright-fieldkit.md` and `.clinerules/workflows/` into the
+`.clinerules/pw-playwright-fieldkit.md` and `.clinerules/workflows/` into the
 project; do not replace unrelated rules already there. Then, from the project
 root:
 
 ```bash
 # 1. Install the browser engine (once)
-(cd .cline/skills/playwright-fieldkit/scripts && npm install && npx playwright install chromium)
+(cd .cline/skills/pw-playwright-fieldkit/scripts && npm install && npx playwright install chromium)
 
 # 2. Map a site
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://your-app.example.com --depth 2 --max-pages 40
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://your-app.example.com --depth 2 --max-pages 40
 
-# 3. Read playwright-report-explore/report.md — or just ask Cline to "/explore-site"
+# 3. Read playwright-report-explore/report.md — or just ask Cline to "/pw-explore-site"
 ```
 
 If you use **Cline**, the canonical package lives in
-`.cline/skills/playwright-fieldkit/`. A small always-on rule helps weaker models
+`.cline/skills/pw-playwright-fieldkit/`. A small always-on rule helps weaker models
 activate it from natural-language requests, while the familiar workflows remain
 available as explicit shortcuts:
 
-- *"Explore my site at localhost:3000 and tell me what's broken"* → `/explore-site`
-- *"The save button throws an error, debug it"* → `/debug-site`
-- *"What features does this app have that aren't documented?"* → `/discover-features`
-- *"Write integration tests for the login and search flows"* → `/generate-tests`
-- *"Let me demonstrate the checkout flow in a browser"* → `/record-flow`
-- *"Audit the site and tell me what to improve"* → `/recommend-improvements`
-- *"Did my last deploy change or break anything?"* → `/compare-runs`
+- *"Explore my site at localhost:3000 and tell me what's broken"* → `/pw-explore-site`
+- *"The save button throws an error, debug it"* → `/pw-debug-site`
+- *"What features does this app have that aren't documented?"* → `/pw-discover-features`
+- *"Write integration tests for the login and search flows"* → `/pw-generate-tests`
+- *"Let me demonstrate the checkout flow in a browser"* → `/pw-record-flow`
+- *"Audit the site and tell me what to improve"* → `/pw-recommend-improvements`
+- *"Did my last deploy change or break anything?"* → `/pw-compare-runs`
 
 Quality engineers can also use explicit shortcuts for charters, coverage gaps,
 test data, negative paths, interactive accessibility, risk-based matrices, and
@@ -118,7 +118,7 @@ flake triage. The [QA/QE Guide](docs/qa-qe-guide.md) starts with the
 non-technical “demonstrate, then explain” workflow.
 
 Using another coding-agent harness? Keep the canonical skill at
-`.cline/skills/playwright-fieldkit/` and point that harness's repository rule or
+`.cline/skills/pw-playwright-fieldkit/` and point that harness's repository rule or
 native skill adapter at its `SKILL.md`. The
 [agent-harness guide](docs/agent-harness-guide.md) includes a portable adapter
 prompt, shortcut mapping, capability requirements, and a smoke test.
@@ -128,8 +128,8 @@ prompt, shortcut mapping, capability requirements, and a smoke test.
 ## What's in the box
 
 ```
-playwright-fieldkit/
-├── .cline/skills/playwright-fieldkit/
+pw-playwright-fieldkit/
+├── .cline/skills/pw-playwright-fieldkit/
 │   ├── SKILL.md             # Intent routing, operating guidance, safety
 │   ├── scripts/             # Deterministic browser engine + regression suite
 │   │   ├── crawl.mjs
@@ -154,11 +154,11 @@ playwright-fieldkit/
 
 - **Node.js 18+**
 - **Playwright** (`npm install && npx playwright install chromium` in
-  `.cline/skills/playwright-fieldkit/scripts/`)
+  `.cline/skills/pw-playwright-fieldkit/scripts/`)
 - A coding agent that can run shell commands and read files (Cline, or any
   similar agent). **No web-search/fetch capability is needed.**
 
-Run the bundled localhost regression suite with `cd .cline/skills/playwright-fieldkit/scripts && npm test`.
+Run the bundled localhost regression suite with `cd .cline/skills/pw-playwright-fieldkit/scripts && npm test`.
 
 ---
 

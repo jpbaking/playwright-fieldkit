@@ -9,7 +9,7 @@ Report vulnerabilities through [SECURITY.md](SECURITY.md), not a public issue.
 ## Development setup
 
 ```bash
-cd .cline/skills/playwright-fieldkit/scripts
+cd .cline/skills/pw-playwright-fieldkit/scripts
 npm ci
 npx playwright install chromium
 npm test
@@ -22,7 +22,7 @@ their native runners.
 
 ## Pull requests
 
-- Preserve `.cline/skills/playwright-fieldkit/` as the canonical package.
+- Preserve `.cline/skills/pw-playwright-fieldkit/` as the canonical package.
 - Keep `.clinerules/workflows/` as thin shortcuts to canonical playbooks.
 - Add or update deterministic self-tests for behavioral changes.
 - Update the Coder, QA/QE, installation, troubleshooting, or harness guide when

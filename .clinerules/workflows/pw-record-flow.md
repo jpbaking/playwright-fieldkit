@@ -1,0 +1,7 @@
+# /pw-record-flow
+
+Activate the `pw-playwright-fieldkit` skill (or read
+`.cline/skills/pw-playwright-fieldkit/SKILL.md`), then read and follow
+`.cline/skills/pw-playwright-fieldkit/references/workflows/pw-record-flow.md`.
+
+Execute the workflow now; do not merely suggest this shortcut to the user.

@@ -10,7 +10,7 @@ Playwright code. For CLI flags and file formats, use the
 You do not need to begin with selectors or test code.
 
 1. Ask the agent: “Let me demonstrate the checkout journey at `<URL>`,” or use
-   `/record-flow`.
+   `/pw-record-flow`.
 2. Use the visible website normally while Playwright records your actions.
 3. Close the recorder when the journey is complete.
 4. Explain the business intent and what should prove success.
@@ -35,14 +35,14 @@ The agent preserves both as reviewed tests, journey charters, and optional
 
 | QE activity | Shortcut | Result |
 |---|---|---|
-| Demonstrate behavior | `/record-flow` | Recorded draft plus reviewed test/flow |
-| Preserve intent and risk | `/create-test-charter` | `journey.md` and normalized JSON |
-| Find missing automation | `/analyze-test-coverage` | Route/form gap report |
-| Plan reliable data | `/plan-test-data` | Setup, isolation, ownership, cleanup plan |
-| Add failure paths | `/generate-negative-tests` | Verified mocked/real negative tests |
-| Check interactive accessibility | `/audit-journey` | State-specific accessibility assertions |
-| Exercise meaningful variants | `/run-test-matrix` | Role/browser/device result matrix |
-| Diagnose intermittency | `/triage-flaky-test` | Repeated-run evidence and classification |
+| Demonstrate behavior | `/pw-record-flow` | Recorded draft plus reviewed test/flow |
+| Preserve intent and risk | `/pw-create-test-charter` | `journey.md` and normalized JSON |
+| Find missing automation | `/pw-analyze-test-coverage` | Route/form gap report |
+| Plan reliable data | `/pw-plan-test-data` | Setup, isolation, ownership, cleanup plan |
+| Add failure paths | `/pw-generate-negative-tests` | Verified mocked/real negative tests |
+| Check interactive accessibility | `/pw-audit-journey` | State-specific accessibility assertions |
+| Exercise meaningful variants | `/pw-run-test-matrix` | Role/browser/device result matrix |
+| Diagnose intermittency | `/pw-triage-flaky-test` | Repeated-run evidence and classification |
 
 These workflows also activate from normal language; the slash commands are
 shortcuts when you want to be explicit.
@@ -60,14 +60,14 @@ the QE reasoning needed to maintain the automation:
 - meaningful role/browser/device variants;
 - links to the recording, flow, and final test.
 
-Ask `/create-test-charter` after describing the intent. The agent uses the
+Ask `/pw-create-test-charter` after describing the intent. The agent uses the
 bundled template and validates that outcomes exist and destructive journeys have
 cleanup. Warnings identify missing preconditions, data isolation, or similar
 review items.
 
 ## 2. Find coverage gaps
 
-Ask `/analyze-test-coverage` after crawling the relevant environment and role.
+Ask `/pw-analyze-test-coverage` after crawling the relevant environment and role.
 The agent compares discovered routes and forms with literal navigation evidence
 in the existing Python or Node tests.
 
@@ -78,7 +78,7 @@ data-changing forms rather than creating one shallow test per page.
 
 ## 3. Make test data repeatable
 
-Ask `/plan-test-data` before automating journeys that create or modify data. The
+Ask `/pw-plan-test-data` before automating journeys that create or modify data. The
 agent inspects existing fixtures and API clients, then documents:
 
 - how each test gets unique or isolated data;
@@ -93,7 +93,7 @@ must adapt them to real project APIs rather than invent endpoints.
 
 ## 4. Add meaningful negative paths
 
-Ask `/generate-negative-tests` with the charter's risk. Good candidates include:
+Ask `/pw-generate-negative-tests` with the charter's risk. Good candidates include:
 
 - invalid or missing input;
 - unauthorized roles;
@@ -110,7 +110,7 @@ integration.
 ## 5. Audit accessibility after interactions
 
 Page-load audits miss menus, dialogs, validation messages, and error states.
-Ask `/audit-journey` to place `auditA11y` checks after meaningful interactions.
+Ask `/pw-audit-journey` to place `auditA11y` checks after meaningful interactions.
 The check covers document language, main/h1 structure, form labels, and names for
 buttons, links, and dialogs, and is emitted into generated Python/Node tests.
 
@@ -119,7 +119,7 @@ keyboard/screen-reader assessment and use the project's axe setup when present.
 
 ## 6. Choose a risk-based matrix
 
-Ask `/run-test-matrix` to select combinations justified by product risk:
+Ask `/pw-run-test-matrix` to select combinations justified by product risk:
 
 - anonymous/customer/admin roles;
 - Chromium plus engines with real support risk;
@@ -132,7 +132,7 @@ native projects/parameters when already configured.
 
 ## 7. Triage flaky tests with evidence
 
-Ask `/triage-flaky-test` with the narrowest command that reproduces the suspect
+Ask `/pw-triage-flaky-test` with the narrowest command that reproduces the suspect
 test. The agent repeats it, preserves per-run logs/artifacts, and classifies
 signals such as locator/readiness, timing, network/backend, shared data,
 browser/infrastructure, and product/assertion failures.

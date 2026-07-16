@@ -7,13 +7,13 @@ Quick fixes for the things that actually go wrong.
 **`Playwright is not installed`**
 Run the one-time setup from the toolkit root:
 ```bash
-cd .cline/skills/playwright-fieldkit/scripts && npm install && npx playwright install chromium
+cd .cline/skills/pw-playwright-fieldkit/scripts && npm install && npx playwright install chromium
 ```
 
 **`browserType.launch: Executable doesn't exist …`**
 The library is installed but the browser engine isn't. Run
 `npx playwright install chromium` from
-`.cline/skills/playwright-fieldkit/scripts/`. On Linux add
+`.cline/skills/pw-playwright-fieldkit/scripts/`. On Linux add
 `npx playwright install-deps chromium`.
 
 **`Host system is missing dependencies` / library errors on Linux**
@@ -43,7 +43,7 @@ a successful report. If options changed, start a fresh output directory.
 
 **A URL is outside the authorization allowlist.**
 Review `fieldkit.config.json`,
-`.cline/skills/playwright-fieldkit/scripts/targets.txt`, or the file passed
+`.cline/skills/pw-playwright-fieldkit/scripts/targets.txt`, or the file passed
 through `--scope-config`. Add the intended origin/host only when you are authorized.
 `--i-am-authorized` is an explicit override and is recorded in output metadata.
 
@@ -143,7 +143,7 @@ recordings. Delete unreviewed drafts and HAR/auth artifacts when no longer neede
 **The generated `.spec.ts`/`.spec.js` won't run.**
 - Install the runner in your app project: `npm install -D @playwright/test`.
 - Set `baseURL` in `playwright.config.ts` (copy from
-  `.cline/skills/playwright-fieldkit/templates/`), or make the `goto` paths
+  `.cline/skills/pw-playwright-fieldkit/templates/`), or make the `goto` paths
   absolute.
 
 **The generated test passes as a flow but fails in the project runner.**

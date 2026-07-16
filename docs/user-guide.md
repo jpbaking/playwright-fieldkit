@@ -62,7 +62,7 @@ The reporting commands write Markdown plus JSON. `crawl.mjs` and
 You need **Node.js 18+**. Then, once:
 
 ```bash
-cd .cline/skills/playwright-fieldkit/scripts
+cd .cline/skills/pw-playwright-fieldkit/scripts
 npm install                     # installs the playwright library
 npx playwright install chromium # downloads the browser engine
 npm test                         # runs the bundled localhost regression suite
@@ -81,7 +81,7 @@ established by the consuming project: commonly `pytest-playwright` for Python or
 ## The tools
 
 Run everything with
-`node .cline/skills/playwright-fieldkit/scripts/<name>.mjs`. The tools accept
+`node .cline/skills/pw-playwright-fieldkit/scripts/<name>.mjs`. The tools accept
 `--help` except `save-auth.mjs`, which currently requires a login URL or
 `--flow`.
 
@@ -92,7 +92,7 @@ status, console errors, uncaught exceptions, failed/slow requests, dialogs,
 forms, buttons, interactive widgets, and hidden links.
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs <startUrl> [options]
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs <startUrl> [options]
 ```
 
 | Option | Default | Meaning |
@@ -143,7 +143,7 @@ Skipped URLs and their matched rule are retained in `crawl.json`. Add
 `--delay <ms>` to pause between navigations:
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://site.com --respect-robots --delay 500
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://site.com --respect-robots --delay 500
 ```
 
 <a name="spa-route-discovery"></a>
@@ -168,10 +168,10 @@ reach thousands of URLs, so `--max-pages` is what really bounds a run. Use
 
 ```bash
 # Only the docs section, logged out
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://site.com/docs/ --same-path --max-pages 60
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://site.com/docs/ --same-path --max-pages 60
 
 # Whole app but skip logout/API/downloads
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://app.site.com --exclude "/logout|/api/|\.pdf$"
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://app.site.com --exclude "/logout|/api/|\.pdf$"
 ```
 
 Assets (images, CSS, JS, PDFs, fonts, …) are automatically skipped as navigation
@@ -202,7 +202,7 @@ redirects outside it are recorded as skipped rather than contacted.
 compatible options with the same `--out` plus `--resume`. A successful report
 removes the checkpoint; incompatible options are rejected.
 
-**Authorization scope.** If `fieldkit.config.json` or `.cline/skills/playwright-fieldkit/scripts/targets.txt`
+**Authorization scope.** If `fieldkit.config.json` or `.cline/skills/pw-playwright-fieldkit/scripts/targets.txt`
 exists, live-browser commands enforce it. JSON uses an `allowedOrigins` array;
 the text format uses one origin/host pattern per line. Exact origins, hosts,
 ports, and `*` wildcards are supported:
@@ -222,7 +222,7 @@ failed/slow requests, the accessibility ("screen-reader") tree, a full-page
 screenshot, and the rendered HTML. Optionally clicks things and re-captures.
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/inspect.mjs <url> [options]
+node .cline/skills/pw-playwright-fieldkit/scripts/inspect.mjs <url> [options]
 ```
 
 | Option | Default | Meaning |
@@ -240,7 +240,7 @@ node .cline/skills/playwright-fieldkit/scripts/inspect.mjs <url> [options]
 
 ```bash
 # Reproduce a bug that only appears after interacting
-node .cline/skills/playwright-fieldkit/scripts/inspect.mjs https://app.site.com/editor \
+node .cline/skills/pw-playwright-fieldkit/scripts/inspect.mjs https://app.site.com/editor \
      --click "text=New" --click "#save" --wait 2000
 ```
 
@@ -265,7 +265,7 @@ Runs a sequence of steps from a JSON file, captures what happened at each step,
 tells you exactly where it failed, and can emit a Playwright test.
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/flow.mjs <flow.json> [options]
+node .cline/skills/pw-playwright-fieldkit/scripts/flow.mjs <flow.json> [options]
 ```
 
 | Option | Default | Meaning |
@@ -279,7 +279,7 @@ node .cline/skills/playwright-fieldkit/scripts/flow.mjs <flow.json> [options]
 | `--wait <ms>` | `500` | Settle time after each step. |
 
 The CLI does not guess the repository's language: the output filename makes the
-choice explicit. The `/generate-tests` workflow first inspects existing test
+choice explicit. The `/pw-generate-tests` workflow first inspects existing test
 code and dependencies, and asks when the convention is missing or ambiguous.
 Python output currently targets pytest with Playwright's synchronous `page`
 fixture. The exit code is `0` if the flow passed and `1` if any step failed.
@@ -293,7 +293,7 @@ adds missing intent/outcome assertions, removes secrets, fits it to the existing
 suite, and verifies it.
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/record.mjs https://app.example.com \
+node .cline/skills/pw-playwright-fieldkit/scripts/record.mjs https://app.example.com \
   --output report/recording/test_checkout.py
 ```
 
@@ -317,7 +317,7 @@ regression detection (before/after a deploy), gated-feature discovery
 (logged-out vs logged-in, or role vs role).
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/compare.mjs <baseline> <current> [--out dir]
+node .cline/skills/pw-playwright-fieldkit/scripts/compare.mjs <baseline> <current> [--out dir]
 ```
 
 You can pass either a run's directory or its `crawl.json` for each argument. Page
@@ -338,15 +338,15 @@ pass `--no-aria` if you want the structural diff. The report
 
 ```bash
 # Regression check around a deploy
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://staging.app --out report/before
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://staging.app --out report/before
 # ...deploy...
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://staging.app --out report/after
-node .cline/skills/playwright-fieldkit/scripts/compare.mjs report/before report/after
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://staging.app --out report/after
+node .cline/skills/pw-playwright-fieldkit/scripts/compare.mjs report/before report/after
 
 # Find what a login unlocks
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://app --out report/anon
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://app --storage-state auth.json --out report/auth
-node .cline/skills/playwright-fieldkit/scripts/compare.mjs report/anon report/auth
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://app --out report/anon
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://app --storage-state auth.json --out report/auth
+node .cline/skills/pw-playwright-fieldkit/scripts/compare.mjs report/anon report/auth
 ```
 
 The stdout summary (`{newPages, removedPages, statusChanges, errorRegressions}`)
@@ -358,10 +358,10 @@ Captures cookies + localStorage into an `auth.json` you pass to the other tools.
 
 ```bash
 # Interactive: a browser opens, you log in, press Enter to save
-node .cline/skills/playwright-fieldkit/scripts/save-auth.mjs https://app.site.com/login --headed --out auth.json
+node .cline/skills/pw-playwright-fieldkit/scripts/save-auth.mjs https://app.site.com/login --headed --out auth.json
 
 # Scripted: log in from a flow that ends logged-in
-node .cline/skills/playwright-fieldkit/scripts/save-auth.mjs --flow login.json --out auth.json
+node .cline/skills/pw-playwright-fieldkit/scripts/save-auth.mjs --flow login.json --out auth.json
 ```
 
 See [Authentication](#authentication).
@@ -373,10 +373,10 @@ normalized JSON. Required fields are `title`, `intent`, and `outcomes`; a
 destructive journey must also declare cleanup.
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/charter.mjs journey.json --out report/journey
+node .cline/skills/pw-playwright-fieldkit/scripts/charter.mjs journey.json --out report/journey
 ```
 
-Start from [`journey.example.json`](../.cline/skills/playwright-fieldkit/templates/journey.example.json).
+Start from [`journey.example.json`](../.cline/skills/pw-playwright-fieldkit/templates/journey.example.json).
 Warnings call out weak preconditions or data isolation without preventing an
 otherwise valid charter from being saved.
 
@@ -386,7 +386,7 @@ Compares a crawl with one or more Python/JavaScript/TypeScript test files or
 directories. It writes `coverage-gaps.md` and `coverage-gaps.json`.
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/coverage.mjs \
+node .cline/skills/pw-playwright-fieldkit/scripts/coverage.mjs \
   report/explore tests/e2e --out report/coverage
 ```
 
@@ -402,11 +402,11 @@ and without shell interpolation. It preserves a log per variant and writes
 `matrix.md`/`matrix.json`; the process fails when any variant fails.
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/matrix.mjs matrix.json --dry-run
-node .cline/skills/playwright-fieldkit/scripts/matrix.mjs matrix.json --out report/matrix
+node .cline/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --dry-run
+node .cline/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --out report/matrix
 ```
 
-Start from [`matrix.example.json`](../.cline/skills/playwright-fieldkit/templates/matrix.example.json).
+Start from [`matrix.example.json`](../.cline/skills/pw-playwright-fieldkit/templates/matrix.example.json).
 Prefer the consuming test runner's native projects or parameters when they
 already provide the required matrix.
 
@@ -417,7 +417,7 @@ failures into readiness/locator, timing, network/backend, shared-data,
 browser/infrastructure, product/assertion, or unknown evidence.
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/triage.mjs \
+node .cline/skills/pw-playwright-fieldkit/scripts/triage.mjs \
   --runs 8 --artifacts test-results --out report/triage -- \
   pytest tests/e2e/test_checkout.py::test_submit
 ```
@@ -432,7 +432,7 @@ a failing exit when any run fails, making accidental CI success unlikely.
 A flow is a JSON object with a `steps` array. Each step is **one object with
 exactly one supported action key** plus any options that action needs, such as
 `value`, `selector`, `status`, or `body`. Option order does not matter. Start from
-[`.cline/skills/playwright-fieldkit/templates/flow.example.json`](../.cline/skills/playwright-fieldkit/templates/flow.example.json).
+[`.cline/skills/pw-playwright-fieldkit/templates/flow.example.json`](../.cline/skills/pw-playwright-fieldkit/templates/flow.example.json).
 
 ```json
 {
@@ -485,7 +485,7 @@ The `expect*` actions are what make a flow a *test*: if the condition isn't met,
 the flow fails at that step and tells you why. Generating a test with
 `--gen-test` converts these into the selected language's Playwright assertions.
 Mock routes and state audits are also emitted into generated tests. See
-[`negative-flow.example.json`](../.cline/skills/playwright-fieldkit/templates/negative-flow.example.json)
+[`negative-flow.example.json`](../.cline/skills/pw-playwright-fieldkit/templates/negative-flow.example.json)
 for a failure-path example. `auditA11y` is a focused smoke audit, not proof of
 WCAG conformance. Its finding codes are `missing-lang`, `missing-main`,
 `h1-count`, `unlabeled-control`, `unnamed-button`, `unnamed-link`, and
@@ -504,7 +504,7 @@ To explore pages behind a login, capture a session once and reuse it.
 **Interactive (simplest, works with SSO / 2FA / captchas):**
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/save-auth.mjs https://app.example.com/login --headed --out auth.json
+node .cline/skills/pw-playwright-fieldkit/scripts/save-auth.mjs https://app.example.com/login --headed --out auth.json
 # A real browser opens. Log in however you normally would.
 # Switch back to the terminal and press Enter. auth.json is written.
 ```
@@ -513,7 +513,7 @@ node .cline/skills/playwright-fieldkit/scripts/save-auth.mjs https://app.example
 flow that ends logged-in, then:
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/save-auth.mjs --flow login.json --out auth.json
+node .cline/skills/pw-playwright-fieldkit/scripts/save-auth.mjs --flow login.json --out auth.json
 ```
 
 Scripted authentication supports the same step vocabulary as `flow.mjs`,
@@ -525,9 +525,9 @@ cannot silently save an unauthenticated state.
 **Then reuse it everywhere:**
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs   https://app.example.com --storage-state auth.json
-node .cline/skills/playwright-fieldkit/scripts/inspect.mjs https://app.example.com/settings --storage-state auth.json
-node .cline/skills/playwright-fieldkit/scripts/flow.mjs    checkout.json --storage-state auth.json
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs   https://app.example.com --storage-state auth.json
+node .cline/skills/pw-playwright-fieldkit/scripts/inspect.mjs https://app.example.com/settings --storage-state auth.json
+node .cline/skills/pw-playwright-fieldkit/scripts/flow.mjs    checkout.json --storage-state auth.json
 ```
 
 > ⚠️ **`auth.json` contains live session cookies. Treat it like a password.**
@@ -582,7 +582,7 @@ not retained. Reach for JSON when the Markdown omits a detail you need.
 ## Working with Cline
 
 The canonical Cline package is the project skill at
-`.cline/skills/playwright-fieldkit/`:
+`.cline/skills/pw-playwright-fieldkit/`:
 
 - **`SKILL.md`** describes when to activate the toolkit, routes requests to the
   right playbook, and carries the safety constraints.
@@ -590,7 +590,7 @@ The canonical Cline package is the project skill at
 - **`scripts/` and `templates/`** travel with the skill instead of cluttering the
   consuming project's root.
 
-Compatibility remains under `.clinerules/`: `playwright-fieldkit.md` is a short
+Compatibility remains under `.clinerules/`: `pw-playwright-fieldkit.md` is a short
 always-on activation hint for models that miss skills, and `workflows/*.md` keep
 explicit browser and QE shortcuts. They include exploration, debugging,
 recording, generation and comparison, plus charter, coverage, data, negative
@@ -610,59 +610,59 @@ without duplicating its procedures.
 
 **"Is my local dev site healthy?"**
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs http://localhost:3000 --depth 2 --max-pages 50
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs http://localhost:3000 --depth 2 --max-pages 50
 ```
 
 **"Reproduce the bug on the checkout page."**
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/inspect.mjs https://app.site.com/checkout \
+node .cline/skills/pw-playwright-fieldkit/scripts/inspect.mjs https://app.site.com/checkout \
      --storage-state auth.json --click "#place-order" --wait 3000
 ```
 
 **"Build a login regression test for an existing Python suite."**
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/flow.mjs login.json --gen-test tests/e2e/test_login.py
+node .cline/skills/pw-playwright-fieldkit/scripts/flow.mjs login.json --gen-test tests/e2e/test_login.py
 pytest tests/e2e/test_login.py   # in your app project
 ```
 
 **"Let me demonstrate the checkout flow."**
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/record.mjs https://app.site.com/checkout \
+node .cline/skills/pw-playwright-fieldkit/scripts/record.mjs https://app.site.com/checkout \
   --output report/recording/test_checkout.py --load-storage auth.json
 ```
 
 **"What can an admin do that a normal user can't?"**
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/save-auth.mjs --flow admin-login.json --out admin.auth.json
-node .cline/skills/playwright-fieldkit/scripts/save-auth.mjs --flow user-login.json  --out user.auth.json
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://app.site.com --storage-state admin.auth.json --out report/admin
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://app.site.com --storage-state user.auth.json  --out report/user
+node .cline/skills/pw-playwright-fieldkit/scripts/save-auth.mjs --flow admin-login.json --out admin.auth.json
+node .cline/skills/pw-playwright-fieldkit/scripts/save-auth.mjs --flow user-login.json  --out user.auth.json
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://app.site.com --storage-state admin.auth.json --out report/admin
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://app.site.com --storage-state user.auth.json  --out report/user
 # Diff the two site maps: admin-only routes are the privileged features.
 ```
 
 **"Screenshot every page for a design review."**
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://site.com --depth 3 --max-pages 100
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://site.com --depth 3 --max-pages 100
 # Browse playwright-report-explore/screenshots/
 ```
 
 **"Did my deploy break anything?"**
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://staging.site.com --out report/before
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://staging.site.com --out report/before
 # ...deploy...
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://staging.site.com --out report/after
-node .cline/skills/playwright-fieldkit/scripts/compare.mjs report/before report/after --out report/diff
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://staging.site.com --out report/after
+node .cline/skills/pw-playwright-fieldkit/scripts/compare.mjs report/before report/after --out report/diff
 # Read report/diff/compare.md
 ```
 
 **"Explore a React SPA that looks like one page."**
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://app.site.com --spa --depth 2 --max-pages 40
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://app.site.com --spa --depth 2 --max-pages 40
 ```
 
 **"Audit the mobile experience."**
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs https://site.com --device "iPhone 13" --depth 2
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://site.com --device "iPhone 13" --depth 2
 ```
 
 ---

@@ -11,15 +11,15 @@ scripts do all the browser work locally.
 
 ## Standard setup
 
-Copy `.cline/skills/playwright-fieldkit/` into that path in the consuming
-project. For Cline, also merge the companion `.clinerules/playwright-fieldkit.md`
+Copy `.cline/skills/pw-playwright-fieldkit/` into that path in the consuming
+project. For Cline, also merge the companion `.clinerules/pw-playwright-fieldkit.md`
 and `.clinerules/workflows/` files into the project. Keep any unrelated rules or
 workflows already present.
 
 Then, from the consuming project root:
 
 ```bash
-cd .cline/skills/playwright-fieldkit/scripts
+cd .cline/skills/pw-playwright-fieldkit/scripts
 npm install                      # installs the `playwright` library
 npx playwright install chromium  # downloads the Chromium engine
 ```
@@ -65,7 +65,7 @@ For an `@playwright/test` suite:
 cd /path/to/your/app
 npm install -D @playwright/test
 npx playwright install chromium
-# copy .cline/skills/playwright-fieldkit/templates/playwright.config.ts to your project root, set baseURL
+# copy .cline/skills/pw-playwright-fieldkit/templates/playwright.config.ts to your project root, set baseURL
 npx playwright test
 ```
 
@@ -80,15 +80,15 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - name: Install Playwright
-        working-directory: .cline/skills/playwright-fieldkit/scripts
+        working-directory: .cline/skills/pw-playwright-fieldkit/scripts
         run: |
           npm install
           npx playwright install --with-deps chromium
       - name: Run toolkit self-tests
-        working-directory: .cline/skills/playwright-fieldkit/scripts
+        working-directory: .cline/skills/pw-playwright-fieldkit/scripts
         run: npm test
       - name: Crawl staging for regressions
-        run: node .cline/skills/playwright-fieldkit/scripts/crawl.mjs "$STAGING_URL" --depth 2 --max-pages 40 --out report
+        run: node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs "$STAGING_URL" --depth 2 --max-pages 40 --out report
         env:
           STAGING_URL: ${{ secrets.STAGING_URL }}
       - uses: actions/upload-artifact@v4
@@ -111,20 +111,20 @@ is added to the toolkit's runtime dependencies.
 ```dockerfile
 FROM mcr.microsoft.com/playwright:v1.61.1-jammy
 WORKDIR /work
-COPY .cline/skills/playwright-fieldkit/scripts/package.json .cline/skills/playwright-fieldkit/scripts/package-lock.json .cline/skills/playwright-fieldkit/scripts/
-RUN cd .cline/skills/playwright-fieldkit/scripts && npm ci
+COPY .cline/skills/pw-playwright-fieldkit/scripts/package.json .cline/skills/pw-playwright-fieldkit/scripts/package-lock.json .cline/skills/pw-playwright-fieldkit/scripts/
+RUN cd .cline/skills/pw-playwright-fieldkit/scripts && npm ci
 COPY . .
 # Browsers are preinstalled in this base image.
-ENTRYPOINT ["node", ".cline/skills/playwright-fieldkit/scripts/crawl.mjs"]
+ENTRYPOINT ["node", ".cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs"]
 ```
 
 ```bash
-docker build -t playwright-fieldkit .
-docker run --rm -v "$PWD/report:/work/report" playwright-fieldkit https://example.com --out report
+docker build -t pw-playwright-fieldkit .
+docker run --rm -v "$PWD/report:/work/report" pw-playwright-fieldkit https://example.com --out report
 ```
 
 Match the base-image tag to the exact `playwright` version pinned in
-`.cline/skills/playwright-fieldkit/scripts/package-lock.json`. The package manifest accepts a range, so copying only
+`.cline/skills/pw-playwright-fieldkit/scripts/package-lock.json`. The package manifest accepts a range, so copying only
 `package.json` and running an unlocked install can select a version whose browser
 binary does not match the image.
 

@@ -8,10 +8,10 @@ harness that can run shell commands and read workspace files can use it.
 
 | Part | Purpose | Harness dependency |
 |---|---|---|
-| `.cline/skills/playwright-fieldkit/scripts/` | Deterministic browser and QE commands | None; ordinary Node.js |
-| `.cline/skills/playwright-fieldkit/templates/` | Flows, charters, matrices, and test scaffolds | None |
-| `.cline/skills/playwright-fieldkit/references/workflows/` | Canonical operating playbooks | None; Markdown |
-| `.cline/skills/playwright-fieldkit/SKILL.md` | Intent router and safety contract | Skill-aware agents can load it directly; others can read it as instructions |
+| `.cline/skills/pw-playwright-fieldkit/scripts/` | Deterministic browser and QE commands | None; ordinary Node.js |
+| `.cline/skills/pw-playwright-fieldkit/templates/` | Flows, charters, matrices, and test scaffolds | None |
+| `.cline/skills/pw-playwright-fieldkit/references/workflows/` | Canonical operating playbooks | None; Markdown |
+| `.cline/skills/pw-playwright-fieldkit/SKILL.md` | Intent router and safety contract | Skill-aware agents can load it directly; others can read it as instructions |
 | `.clinerules/` | Cline activation hint and slash-command shortcuts | Cline-specific adapter |
 
 The `.cline` directory name is packaging, not a runtime API dependency. For the
@@ -20,7 +20,7 @@ harness uses it: the skill and examples intentionally use stable workspace-root
 commands such as:
 
 ```bash
-node .cline/skills/playwright-fieldkit/scripts/crawl.mjs <URL>
+node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL>
 ```
 
 If you relocate the package, update those path references consistently. Do not
@@ -38,14 +38,14 @@ The agent needs permission to:
 Node.js 18+ and the Playwright browser engine are installed once:
 
 ```bash
-cd .cline/skills/playwright-fieldkit/scripts
+cd .cline/skills/pw-playwright-fieldkit/scripts
 npm install
 npx playwright install chromium
 npm test
 ```
 
 No browser MCP server, web-search capability, or model-specific API is required.
-`/record-flow` is the exception to headless operation: recording needs a visible
+`/pw-record-flow` is the exception to headless operation: recording needs a visible
 desktop, display forwarding, or VNC so the user can control Codegen.
 
 ## Integration pattern A: a repository instruction
@@ -55,7 +55,7 @@ repository-level instructions, using whatever filename that harness recognizes:
 
 ```markdown
 For requests to explore, debug, audit, record, compare, or automate a live web
-application, read `.cline/skills/playwright-fieldkit/SKILL.md`. Select and follow
+application, read `.cline/skills/pw-playwright-fieldkit/SKILL.md`. Select and follow
 the matching canonical workflow under its `references/workflows/` directory.
 Run the workflow; do not only tell the user which command exists. Operate only on
 authorized targets and never add `--i-am-authorized` without explicit approval.
@@ -73,7 +73,7 @@ charters, coverage gaps, negative paths, matrices, accessibility states, and
 flake triage. Its body only needs to say:
 
 ```markdown
-Read and follow `.cline/skills/playwright-fieldkit/SKILL.md`. Treat its linked
+Read and follow `.cline/skills/pw-playwright-fieldkit/SKILL.md`. Treat its linked
 workflow references, scripts, templates, and safety rules as canonical.
 ```
 
@@ -90,12 +90,12 @@ canonical file. For example:
 
 | Shortcut | Canonical workflow |
 |---|---|
-| `explore-site` | `references/workflows/explore-site.md` |
-| `record-flow` | `references/workflows/record-flow.md` |
-| `create-test-charter` | `references/workflows/create-test-charter.md` |
-| `analyze-test-coverage` | `references/workflows/analyze-test-coverage.md` |
-| `generate-negative-tests` | `references/workflows/generate-negative-tests.md` |
-| `triage-flaky-test` | `references/workflows/triage-flaky-test.md` |
+| `pw-explore-site` | `references/workflows/pw-explore-site.md` |
+| `pw-record-flow` | `references/workflows/pw-record-flow.md` |
+| `pw-create-test-charter` | `references/workflows/pw-create-test-charter.md` |
+| `pw-analyze-test-coverage` | `references/workflows/pw-analyze-test-coverage.md` |
+| `pw-generate-negative-tests` | `references/workflows/pw-generate-negative-tests.md` |
+| `pw-triage-flaky-test` | `references/workflows/pw-triage-flaky-test.md` |
 
 The complete routing list is in `SKILL.md`. Preserve a single source of truth:
 wrappers should delegate, not restate the procedure.
@@ -105,7 +105,7 @@ wrappers should delegate, not restate the procedure.
 For a terminal-capable agent with no persistent rules or skill discovery, give
 it a direct prompt:
 
-> Read `.cline/skills/playwright-fieldkit/SKILL.md`, follow the workflow matching
+> Read `.cline/skills/pw-playwright-fieldkit/SKILL.md`, follow the workflow matching
 > my request, and execute its bundled scripts. Explore my authorized staging app
 > at `https://…` and report what is broken.
 
@@ -132,7 +132,7 @@ After adding an adapter, ask the harness:
 > What bundled workflow would you use to let me demonstrate a checkout journey,
 > and what files would it read? Do not start the browser yet.
 
-A correctly integrated agent should find `SKILL.md`, select `record-flow.md`,
+A correctly integrated agent should find `SKILL.md`, select `pw-record-flow.md`,
 mention the headed browser/user handoff, and recognize that intent and outcome
 must be captured after recording. Then run `npm test` to validate the portable
 runtime independently of the agent integration.
