@@ -128,8 +128,8 @@ guide for each workflow set.
 Using another coding-agent harness? Keep the canonical skill at
 `.cline/skills/pw-playwright-fieldkit/` and point that harness's repository rule or
 native skill adapter at its `SKILL.md`. The
-[User Guide](docs/user-guide.md) links to the portable adapter prompt, shortcut
-mapping, capability requirements, and smoke test.
+[Agent Harness Guide](docs/setup/agent-harness.md) has the portable adapter
+prompt, shortcut mapping, capability requirements, and smoke test.
 
 ---
 

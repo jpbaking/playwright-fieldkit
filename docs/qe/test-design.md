@@ -108,8 +108,11 @@ The agent asks for an explicit decision:
 > Do you approve these test cases as the executable interpretation of this
 > feature specification? Reply **approve**, **request changes**, or **not yet**.
 
-Only the user can provide approval. Approved artifacts require a reviewer and no
-open questions:
+Only the user can provide approval. Approval is bound to the exact content: the
+validator reports a `contentHash`, and the approved artifact records it as
+`review.approvedHash`. Editing an approved case set invalidates the approval
+until it is re-reviewed. Approved artifacts require a reviewer, the matching
+hash, and no open questions:
 
 ```bash
 node .cline/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \

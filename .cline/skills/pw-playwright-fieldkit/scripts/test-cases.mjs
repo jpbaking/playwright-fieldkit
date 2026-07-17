@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Validate and render test cases derived from a feature specification.
 
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 import { ensureDir, join, log, parseArgs, resolveOut, writeJson, writeText } from "./lib/util.mjs";
@@ -8,14 +9,22 @@ import { ensureDir, join, log, parseArgs, resolveOut, writeJson, writeText } fro
 const HELP = `test-cases.mjs — validate and render specification-derived test cases
 
   node test-cases.mjs <test-cases.json> [--out report/test-cases]
+                                      [--case <TC-ID>]... [--flow-skeletons]
                                       [--require-approved]
 
 Required: feature.title/source, requirements[], and cases[]. Each case must
 trace to known requirement IDs and contain actions with expected results.
+--case restricts the rendered cases (and skeletons) to the selected IDs.
+--flow-skeletons writes an untranslated flow skeleton per automation-candidate
+case under <out>/flows/; flow.mjs refuses to run a skeleton until every step
+is translated into a supported action.
+Approval binds to content: an approved document must carry review.approvedHash
+equal to the contentHash reported by this validator.
 See ../templates/test-cases.example.json.`;
 
 const TYPES = new Set(["positive", "negative", "boundary", "permission", "accessibility", "recovery", "compatibility"]);
 const PRIORITIES = new Set(["low", "medium", "high", "critical"]);
+const RISKS = PRIORITIES; // requirements use the same low→critical vocabulary
 const REVIEW_STATUSES = new Set(["draft", "ready-for-approval", "changes-requested", "approved"]);
 
 function text(value) {
@@ -69,12 +78,41 @@ function list(values) {
   return values.length ? values.map((value) => `- ${value}`).join("\n") : "_None._";
 }
 
+function slugifyId(id) {
+  return id.replace(/[^A-Za-z0-9._-]+/g, "-");
+}
+
+function flowSkeleton(testCase, sourceFile) {
+  return {
+    name: `${testCase.id}: ${testCase.title}`,
+    baseUrl: "https://REPLACE-WITH-AUTHORIZED-TARGET",
+    skeleton: [
+      `Generated from ${sourceFile}. Translate every step into exactly one supported flow.mjs action before running.`,
+      "flow.mjs refuses to run steps that still carry only todo/source keys.",
+      `Preconditions: ${testCase.preconditions.join("; ") || "none stated"}`,
+      `Test data: ${testCase.testData.join("; ") || "none stated"}`,
+      `Cleanup: ${testCase.cleanup.join("; ") || "none stated"}`,
+    ],
+    steps: testCase.steps.map((step, index) => ({
+      todo: "replace with one flow.mjs action that performs the source action, then assert the expected result",
+      source: { step: index + 1, action: step.action, expected: step.expected },
+    })),
+  };
+}
+
 function main() {
   const args = parseArgs();
   if (args.help || args._.length !== 1) {
     console.log(HELP);
     process.exit(args.help ? 0 : 1);
   }
+  for (const flag of ["require-approved", "flow-skeletons"]) {
+    if (flag in args && typeof args[flag] !== "boolean") {
+      log.err(`--${flag} takes no value; got ${JSON.stringify(args[flag])}`);
+      process.exit(1);
+    }
+  }
+  const selectedCaseIds = args.case === undefined ? [] : [args.case].flat().map(text).filter(Boolean);
 
   let source;
   try {
@@ -98,10 +136,21 @@ function main() {
     review: {
       status: text(source.review?.status || "draft").toLowerCase(),
       reviewer: source.review?.reviewer ? text(source.review.reviewer) : null,
+      approvedHash: source.review?.approvedHash ? text(source.review.approvedHash) : null,
       notes: strings(source.review?.notes),
     },
     sourceFile: basename(args._[0]),
   };
+
+  // Approval binds to this hash of everything except the review block, so a
+  // post-approval edit invalidates the recorded approval.
+  const contentHash = createHash("sha256").update(JSON.stringify({
+    feature: data.feature,
+    requirements: data.requirements,
+    assumptions: data.assumptions,
+    openQuestions: data.openQuestions,
+    cases: data.cases,
+  })).digest("hex");
 
   const errors = [];
   const warnings = [];
@@ -116,7 +165,7 @@ function main() {
   data.requirements.forEach((requirement, index) => {
     if (!requirement.id) errors.push(`requirement ${index + 1} has no ID`);
     if (!requirement.text) errors.push(`requirement ${requirement.id || index + 1} has no text`);
-    if (!PRIORITIES.has(requirement.risk)) warnings.push(`requirement ${requirement.id || index + 1} has non-standard risk: ${requirement.risk}`);
+    if (!RISKS.has(requirement.risk)) warnings.push(`requirement ${requirement.id || index + 1} has non-standard risk: ${requirement.risk}`);
     if (!requirement.sourceRef) warnings.push(`requirement ${requirement.id || index + 1} has no source reference`);
   });
 
@@ -151,20 +200,24 @@ function main() {
   for (const id of requirementIds) {
     if (!covered.has(id)) warnings.push(`requirement ${id} has no test case`);
   }
-  if (duplicates(data.cases.map((testCase) => testCase.title.toLowerCase()).filter(Boolean)).length) {
-    warnings.push("two or more test cases have the same title");
+  for (const title of duplicates(data.cases.map((testCase) => testCase.title.toLowerCase()).filter(Boolean))) {
+    warnings.push(`duplicate test-case title: "${title}"`);
+  }
+  const caseIdSet = new Set(caseIds);
+  for (const id of selectedCaseIds) {
+    if (!caseIdSet.has(id)) errors.push(`--case references unknown test-case ID: ${id}`);
   }
   if (data.review.status === "approved") {
     if (!data.review.reviewer) errors.push("approved test cases require review.reviewer");
     if (data.openQuestions.length) errors.push("approved test cases cannot contain open questions");
+    if (!data.review.approvedHash) {
+      errors.push("approved test cases require review.approvedHash; copy the contentHash reported by a validator run of the approved content");
+    } else if (data.review.approvedHash !== contentHash) {
+      errors.push(`content changed after approval: review.approvedHash does not match contentHash ${contentHash}; re-review and re-approve`);
+    }
   }
   if (args["require-approved"] && data.review.status !== "approved") {
     errors.push(`test cases must be approved before execution; current status is ${data.review.status}`);
-  }
-
-  if (errors.length) {
-    for (const error of errors) log.err(error);
-    process.exit(1);
   }
 
   const traceability = data.requirements.map((requirement) => {
@@ -172,7 +225,10 @@ function main() {
     return `| ${escapeCell(requirement.id)} | ${escapeCell(requirement.text)} | ${escapeCell(requirement.sourceRef || "Not specified")} | ${escapeCell(requirement.risk)} | ${linked.length ? linked.join(", ") : "—"} |`;
   }).join("\n");
 
-  const renderedCases = data.cases.map((testCase) => {
+  const selectedCases = selectedCaseIds.length
+    ? data.cases.filter((testCase) => selectedCaseIds.includes(testCase.id))
+    : data.cases;
+  const renderedCases = selectedCases.map((testCase) => {
     const steps = testCase.steps.map((step, index) => `| ${index + 1} | ${escapeCell(step.action)} | ${escapeCell(step.expected || "Unresolved — not ready for approval")} |`).join("\n");
     return `## ${testCase.id}: ${testCase.title}
 
@@ -212,9 +268,14 @@ ${list(testCase.notes)}`;
 - **Source version:** ${data.feature.version || "Not specified"}
 - **Review status:** ${data.review.status}
 - **Reviewer:** ${data.review.reviewer || "Not assigned"}
+- **Content hash:** ${contentHash}
 - **Summary:** ${data.feature.summary || "Not specified"}
+${selectedCaseIds.length ? `- **Rendered cases:** ${selectedCases.length} of ${data.cases.length} (--case selection)\n` : ""}
+${errors.length ? `## Validation errors
 
-## Requirements traceability
+${list(errors)}
+
+` : ""}## Requirements traceability
 
 | Requirement | Requirement text | Source reference | Risk | Test cases |
 |---|---|---|---|---|
@@ -241,8 +302,22 @@ ${list(warnings)}
 
   const outDir = resolveOut(args.out || "report/test-cases");
   ensureDir(outDir);
-  const jsonPath = writeJson(join(outDir, "test-cases.json"), { ...data, warnings });
+  const jsonPath = writeJson(join(outDir, "test-cases.json"), { ...data, contentHash, errors, warnings });
   const mdPath = writeText(join(outDir, "test-cases.md"), md);
+
+  if (errors.length) {
+    for (const error of errors) log.err(error);
+    log.info(`Validation report with errors: ${mdPath}`);
+    process.exit(1);
+  }
+
+  const flowSkeletons = [];
+  if (args["flow-skeletons"]) {
+    for (const testCase of selectedCases.filter((candidate) => candidate.automationCandidate)) {
+      flowSkeletons.push(writeJson(join(outDir, "flows", `${slugifyId(testCase.id)}.json`), flowSkeleton(testCase, data.sourceFile)));
+    }
+  }
+
   log.ok(`Test cases: ${mdPath}`);
   console.log(JSON.stringify({
     testCases: mdPath,
@@ -250,7 +325,10 @@ ${list(warnings)}
     requirements: data.requirements.length,
     cases: data.cases.length,
     reviewStatus: data.review.status,
+    contentHash,
     warnings: warnings.length,
+    ...(selectedCaseIds.length ? { selectedCases: selectedCaseIds } : {}),
+    ...(flowSkeletons.length ? { flowSkeletons } : {}),
   }));
 }
 

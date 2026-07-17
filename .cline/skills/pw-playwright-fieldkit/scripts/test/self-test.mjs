@@ -261,11 +261,37 @@ Allow: /private/public
     assert.equal(testCases.requirements.length, 2, "test-case design omitted requirements");
     assert.equal(testCases.cases.length, 2, "test-case design omitted cases");
     assert.equal(testCases.review.status, "draft");
+    assert.match(testCases.contentHash, /^[0-9a-f]{64}$/, "validator omitted the content hash");
     await assert.rejects(
       run("test-cases.mjs", [testCaseSource, "--out", join(workDir, "test-cases-blocked"), "--require-approved"]),
       /must be approved before execution/,
       "draft specification-derived cases passed the execution approval gate",
     );
+    const selectedDir = join(workDir, "test-cases-selected");
+    await run("test-cases.mjs", [testCaseSource, "--out", selectedDir, "--case", "TC-COUPON-002", "--flow-skeletons"]);
+    const selectedMd = readFileSync(join(selectedDir, "test-cases.md"), "utf8");
+    assert(selectedMd.includes("## TC-COUPON-002:"), "--case selection omitted the selected case");
+    assert(!selectedMd.includes("## TC-COUPON-001:"), "--case selection rendered an unselected case");
+    const skeletonPath = join(selectedDir, "flows", "TC-COUPON-002.json");
+    const skeleton = readJson(skeletonPath);
+    assert.equal(skeleton.steps[0].source.action, testCaseTemplate.cases[1].steps[0].action, "flow skeleton lost its source action");
+    await assert.rejects(
+      run("flow.mjs", [skeletonPath, "--out", join(workDir, "skeleton-run")]),
+      /exactly one supported action/,
+      "an untranslated flow skeleton was accepted for execution",
+    );
+    await assert.rejects(
+      run("test-cases.mjs", [testCaseSource, "--out", join(workDir, "test-cases-unknown"), "--case", "TC-MISSING"]),
+      /unknown test-case ID/,
+      "--case accepted an unknown test-case ID",
+    );
+    const dupTitleCases = JSON.parse(JSON.stringify(testCaseTemplate));
+    dupTitleCases.cases[1].title = dupTitleCases.cases[0].title;
+    const dupTitleSource = join(workDir, "test-cases-dup-title.json");
+    writeFileSync(dupTitleSource, JSON.stringify(dupTitleCases));
+    const dupTitleDir = join(workDir, "test-cases-dup-title");
+    await run("test-cases.mjs", [dupTitleSource, "--out", dupTitleDir]);
+    assert(readJson(join(dupTitleDir, "test-cases.json")).warnings.some((warning) => warning.startsWith("duplicate test-case title:")), "duplicate-title warning did not name the title");
     const incompleteCases = JSON.parse(JSON.stringify(testCaseTemplate));
     incompleteCases.cases[0].steps[0].expected = "";
     incompleteCases.openQuestions = ["What should the first step display?"];
@@ -281,6 +307,7 @@ Allow: /private/public
       /has no expected result/,
       "incomplete draft advanced to ready-for-approval",
     );
+    assert(readFileSync(join(workDir, "test-cases-not-ready", "test-cases.md"), "utf8").includes("## Validation errors"), "rejected document did not keep an error report");
     testCaseTemplate.review = { status: "approved", reviewer: "QE reviewer", notes: ["Approved for execution"] };
     testCaseTemplate.openQuestions = ["Unresolved business rule"];
     writeFileSync(testCaseSource, JSON.stringify(testCaseTemplate));
@@ -291,9 +318,24 @@ Allow: /private/public
     );
     testCaseTemplate.openQuestions = [];
     writeFileSync(testCaseSource, JSON.stringify(testCaseTemplate));
+    await assert.rejects(
+      run("test-cases.mjs", [testCaseSource, "--out", join(workDir, "test-cases-unbound"), "--require-approved"]),
+      /require review\.approvedHash/,
+      "approval was accepted without a bound content hash",
+    );
+    testCaseTemplate.review.approvedHash = testCases.contentHash;
+    writeFileSync(testCaseSource, JSON.stringify(testCaseTemplate));
     const approvedCaseDir = join(workDir, "test-cases-approved");
     await run("test-cases.mjs", [testCaseSource, "--out", approvedCaseDir, "--require-approved"]);
     assert.equal(readJson(join(approvedCaseDir, "test-cases.json")).review.status, "approved");
+    const tamperedCases = JSON.parse(JSON.stringify(testCaseTemplate));
+    tamperedCases.cases[0].steps[1].expected = "The coupon doubles the total.";
+    writeFileSync(testCaseSource, JSON.stringify(tamperedCases));
+    await assert.rejects(
+      run("test-cases.mjs", [testCaseSource, "--out", join(workDir, "test-cases-tampered"), "--require-approved"]),
+      /content changed after approval/,
+      "a post-approval edit kept its approval",
+    );
 
     const coverageTest = join(workDir, "test_existing.py");
     writeFileSync(coverageTest, `def test_existing(page):\n    page.goto("/flow.html")\n`);
@@ -302,6 +344,16 @@ Allow: /private/public
     const coverage = readJson(join(coverageDir, "coverage-gaps.json"));
     assert(coverage.coveredRoutes.includes("/flow.html"), "coverage analysis missed literal navigation");
     assert(coverage.uncoveredRoutes.includes("/removed.html"), "coverage analysis omitted an uncovered crawl route");
+    const requirementTest = join(workDir, "test_coupon_case.py");
+    writeFileSync(requirementTest, `def test_coupon_case(page):\n    """TC-COUPON-001"""\n    page.goto("/flow.html")\n`);
+    const coverageCasesDir = join(workDir, "coverage-with-cases");
+    await run("coverage.mjs", [baselineDir, coverageTest, requirementTest, "--test-cases", join(testCaseDir, "test-cases.json"), "--out", coverageCasesDir]);
+    const coverageCases = readJson(join(coverageCasesDir, "coverage-gaps.json"));
+    const coveredRequirement = coverageCases.requirementTraceability.find((entry) => entry.id === "REQ-COUPON-1");
+    const uncoveredRequirement = coverageCases.requirementTraceability.find((entry) => entry.id === "REQ-COUPON-2");
+    assert(coveredRequirement.testEvidence.some((file) => file.endsWith("test_coupon_case.py")), "requirement traceability missed a case-ID mention");
+    assert.equal(uncoveredRequirement.testEvidence.length, 0, "requirement traceability invented test evidence");
+    assert(readFileSync(join(coverageCasesDir, "coverage-gaps.md"), "utf8").includes("## Requirement traceability to permanent tests"), "coverage report omitted requirement traceability");
 
     const matrixSource = join(workDir, "matrix-source.json");
     writeFileSync(matrixSource, JSON.stringify({ variants: [
@@ -426,7 +478,18 @@ Allow: /private/public
     const failedFlow = readJson(join(failedFlowDir, "flow.json"));
     assert.equal(failedFlow.passed, false);
     assert(readFileSync(failedFlow.trace).length > 0, "failed flow did not retain a trace");
-    console.log("✓ flow: trace capture, extended operations, and TypeScript/Python assertions");
+    await assert.rejects(
+      run("flow.mjs", [flowPath, "--browser", TEST_BROWSER, "--out", workDir]),
+      /would overwrite the input flow/,
+      "flow runner clobbered its own input file",
+    );
+    assert(Array.isArray(readJson(flowPath).steps), "refused run still overwrote the input flow");
+    await assert.rejects(
+      run("flow.mjs", [failedFlowPath, "--browser", TEST_BROWSER, "--out", join(workDir, "trace-invalid"), "--trace", "not-a-zip"]),
+      /takes no bare value/,
+      "flow runner accepted a bare --trace value",
+    );
+    console.log("✓ flow: trace capture, input protection, extended operations, and TypeScript/Python assertions");
 
     const authFlowPath = join(workDir, "login-flow.json");
     writeFileSync(authFlowPath, JSON.stringify({ baseUrl: origin, steps: [
@@ -484,10 +547,10 @@ Allow: /private/public
     assert(rule.includes("do not merely tell the user"), "always-on rule does not require workflow execution");
     assert(skillRouter.includes("pw-design-test-cases"), "skill router omitted feature-spec test design");
     assert(skillRouter.includes("pw-review-test-cases"), "skill router omitted test-case review");
-    assert.equal(shortcutNames.length, 18, "expected all browser and QE shortcuts");
+    const canonicalNames = readdirSync(canonicalWorkflowDir).filter((name) => name.endsWith(".md")).sort();
+    assert.deepEqual(shortcutNames, canonicalNames, "shortcuts and canonical workflows must match one-to-one");
     for (const name of shortcutNames) {
       const shortcut = readFileSync(resolve(shortcutDir, name), "utf8");
-      readFileSync(resolve(canonicalWorkflowDir, name), "utf8");
       assert(shortcut.includes(`references/workflows/${name}`), `${name} does not route to its canonical workflow`);
     }
     assert(debugWorkflow.includes("Step 2C — If links or navigation targets are wrong"), "canonical debug workflow omitted link-target procedure");
@@ -496,14 +559,17 @@ Allow: /private/public
     assert(recordWorkflow.includes("Launch and wait for the user"), "canonical record workflow omitted the interactive handoff");
     assert(recordWorkflow.includes("pw-generate-tests.md"), "recording workflow omitted permanent traced verification");
     assert(reviewTestCasesWorkflow.includes("--require-approved"), "test-case review workflow omitted the approval gate");
+    assert(reviewTestCasesWorkflow.includes("review.approvedHash"), "test-case review workflow omitted the approval content binding");
     assert(executeTestCaseWorkflow.includes("Offer headed or headless execution"), "test-case execution workflow omitted the display-mode choice");
     assert(executeTestCaseWorkflow.includes("Offer the trace before requesting confirmation"), "test-case execution workflow omitted mandatory trace review");
     assert(executeTestCaseWorkflow.includes("continue with `pw-generate-tests.md`"), "test-case execution workflow omitted its confirmed generation handoff");
+    assert(executeTestCaseWorkflow.includes("case-flow.json"), "test-case execution workflow lost its collision-safe input name");
+    assert(!executeTestCaseWorkflow.includes("report/test-case-run/flow.json"), "test-case execution workflow reintroduced the flow.json input collision");
     assert(runAutomatedTestsWorkflow.includes("--tracing=on"), "automated-test runner omitted Python trace capture");
     assert(runAutomatedTestsWorkflow.includes("--trace on"), "automated-test runner omitted Node trace capture");
     assert(runAutomatedTestsWorkflow.includes("does not accept a feature specification"), "automated-test runner omitted its input boundary");
-    assert(playwrightConfigTemplate.includes("trace: 'on'"), "Playwright config template did not retain every permanent-run trace");
-    console.log("✓ Cline packaging: skill router, 18 shortcuts, and canonical workflows");
+    assert(playwrightConfigTemplate.includes("trace: 'on-first-retry'"), "Playwright config template should keep routine runs lean; evidence runs force --trace on at the CLI");
+    console.log(`✓ Cline packaging: skill router, ${shortcutNames.length} shortcuts, and canonical workflows`);
 
     passed = true;
     console.log("\nAll Playwright FieldKit self-tests passed.");

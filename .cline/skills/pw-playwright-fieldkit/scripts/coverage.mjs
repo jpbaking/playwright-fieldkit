@@ -34,16 +34,26 @@ function routeValue(value, base) {
 function main() {
   const args = parseArgs();
   if (args.help || args._.length < 2) {
-    console.log("coverage.mjs — node coverage.mjs <crawl.json|dir> <test-file|dir...> [--out report/coverage]");
+    console.log("coverage.mjs — node coverage.mjs <crawl.json|dir> <test-file|dir...> [--test-cases <test-cases.json>] [--out report/coverage]");
     process.exit(args.help ? 0 : 1);
+  }
+  if ("test-cases" in args && typeof args["test-cases"] !== "string") {
+    log.err(`--test-cases requires a test-cases JSON path; got ${JSON.stringify(args["test-cases"])}`);
+    process.exit(1);
   }
   let crawl;
   try { crawl = JSON.parse(readFileSync(crawlFile(args._[0]), "utf8")); }
   catch (error) { log.err(`Could not read crawl: ${error.message}`); process.exit(1); }
+  let testCases = null;
+  if (args["test-cases"]) {
+    try { testCases = JSON.parse(readFileSync(args["test-cases"], "utf8")); }
+    catch (error) { log.err(`Could not read test cases: ${error.message}`); process.exit(1); }
+  }
 
   let files;
   try { files = testFiles(args._.slice(1)); }
   catch (error) { log.err(error.message); process.exit(1); }
+  const sources = new Map(files.map((file) => [file, readFileSync(file, "utf8")]));
   const evidence = new Map();
   const add = (route, file) => {
     if (!route) return;
@@ -51,9 +61,28 @@ function main() {
     evidence.get(route).add(file);
   };
   const navigation = /(?:goto|wait_for_url|waitForURL|to_have_url|toHaveURL)\s*\(\s*(?:re\.compile\()?\s*["'`]([^"'`]+)["'`]/g;
-  for (const file of files) {
-    const source = readFileSync(file, "utf8");
+  for (const [file, source] of sources) {
     for (const match of source.matchAll(navigation)) add(routeValue(match[1], crawl.startUrl), file);
+  }
+
+  // Requirement traceability: a permanent test counts as evidence for a
+  // requirement when its source literally mentions the requirement ID or a
+  // linked case ID. Heuristic by design — verify candidates before acting.
+  let requirementTraceability = null;
+  if (testCases) {
+    const mentions = (id) => (id ? files.filter((file) => sources.get(file).includes(id)) : []);
+    const cases = Array.isArray(testCases.cases) ? testCases.cases : [];
+    requirementTraceability = (Array.isArray(testCases.requirements) ? testCases.requirements : []).map((requirement) => {
+      const linked = cases.filter((testCase) => Array.isArray(testCase.requirementIds) && testCase.requirementIds.includes(requirement.id));
+      const testEvidence = [...new Set([...mentions(requirement.id), ...linked.flatMap((testCase) => mentions(testCase.id))])];
+      return {
+        id: requirement.id,
+        risk: requirement.risk,
+        caseIds: linked.map((testCase) => testCase.id),
+        automationCandidates: linked.filter((testCase) => testCase.automationCandidate !== false).map((testCase) => testCase.id),
+        testEvidence,
+      };
+    });
   }
 
   const routes = [...new Set((crawl.pages || []).map((page) => routeValue(page.url, crawl.startUrl)).filter(Boolean))].sort();
@@ -84,11 +113,27 @@ function main() {
     "## Covered routes", "",
     ...(coveredRoutes.length ? coveredRoutes.map((route) => `- \`${route}\` — ${[...evidence.get(route)].join(", ")}`) : ["_None detected._"]), "",
   ];
-  const data = { crawl: crawl.startUrl, testFiles: files, routes, coveredRoutes, uncoveredRoutes, uncoveredForms };
+  if (requirementTraceability) {
+    lines.push(
+      "## Requirement traceability to permanent tests", "",
+      "> A test counts as evidence when it literally mentions the requirement or a linked case ID; verify each candidate.", "",
+      "| Requirement | Risk | Cases | Automation candidates | Permanent-test evidence |",
+      "|---|---|---|---|---|",
+      ...requirementTraceability.map((entry) => `| ${entry.id} | ${entry.risk || "—"} | ${entry.caseIds.join(", ") || "—"} | ${entry.automationCandidates.join(", ") || "—"} | ${entry.testEvidence.join(", ") || "—"} |`),
+      "",
+    );
+  }
+  const data = { crawl: crawl.startUrl, testFiles: files, routes, coveredRoutes, uncoveredRoutes, uncoveredForms, requirementTraceability };
   const mdPath = writeText(join(outDir, "coverage-gaps.md"), lines.join("\n"));
   const jsonPath = writeJson(join(outDir, "coverage-gaps.json"), data);
   log.ok(`Coverage gaps: ${mdPath}`);
-  console.log(JSON.stringify({ report: mdPath, data: jsonPath, uncoveredRoutes: uncoveredRoutes.length, uncoveredForms: uncoveredForms.length }));
+  console.log(JSON.stringify({
+    report: mdPath,
+    data: jsonPath,
+    uncoveredRoutes: uncoveredRoutes.length,
+    uncoveredForms: uncoveredForms.length,
+    ...(requirementTraceability ? { requirementsWithoutTestEvidence: requirementTraceability.filter((entry) => !entry.testEvidence.length).length } : {}),
+  }));
 }
 
 main();

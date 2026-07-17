@@ -24,6 +24,12 @@ Prioritize:
 - forms that create, modify, or delete data;
 - requirements with no approved test case.
 
+When a specification-derived case set exists, add
+`--test-cases report/test-cases/test-cases-source.json` so the report also maps
+each requirement to its designed cases and the permanent tests that literally
+mention a requirement or case ID. Keep those IDs in permanent test titles so
+the mapping stays visible.
+
 Do not create one shallow test per page merely to increase a count. Route a
 feature specification gap to the
 [Test Design guide](test-design.md), or a confirmed journey to the
@@ -48,7 +54,8 @@ Before running variants:
 - isolate accounts and data used in parallel;
 - prevent artifact and trace paths from colliding;
 - use the repository runner's native projects or parameters when available;
-- retain permanent-test traces according to the team policy;
+- retain a trace for every permanent-test variant run, the same contract as
+  `/pw-run-automated-tests`;
 - distinguish unsupported combinations from product failures.
 
 ## Coverage review checklist

@@ -76,8 +76,10 @@ canonical references.
   journey; save a language-matched draft for review and verification.
 - `charter.mjs`: validate QE intent/risk/data/cleanup and render `journey.md`.
 - `test-cases.mjs`: validate requirement traceability, test-case structure, and
-  approval status, then render `test-cases.md`.
-- `coverage.mjs`: compare crawl routes/forms with literal test navigation evidence.
+  content-bound approval status, then render `test-cases.md`; `--case` selects
+  cases and `--flow-skeletons` emits untranslated per-step flow skeletons.
+- `coverage.mjs`: compare crawl routes/forms with literal test navigation
+  evidence; `--test-cases` adds requirement-to-permanent-test traceability.
 - `matrix.mjs`: run an explicit role/browser/device command matrix without a shell.
 - `triage.mjs`: repeat one test command and classify mixed failure signals.
 - `compare.mjs`: compare same-origin crawl datasets.

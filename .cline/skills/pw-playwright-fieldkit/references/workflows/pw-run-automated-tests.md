@@ -72,12 +72,14 @@ Report:
 - cleanup outcome and any evidence limitation.
 
 Always offer the traces for review. On a graphical desktop, open a selected
-trace when the user wants to inspect it; otherwise provide the clickable path
-and exact local command:
+trace when the user wants to inspect it — launch the viewer detached (in the
+background) so the blocking process does not stall or get killed by the agent's
+own command timeout — otherwise provide the clickable path and exact local
+command:
 
 ```bash
 node .cline/skills/pw-playwright-fieldkit/scripts/node_modules/playwright/cli.js \
-  show-trace <trace.zip>
+  show-trace <trace.zip> &
 ```
 
 Treat traces as potentially sensitive. Do not upload them or file external

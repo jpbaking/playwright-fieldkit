@@ -11,7 +11,10 @@ export default defineConfig({
   use: {
     // Point every test at your app; goto('/path') resolves against this.
     baseURL: process.env.BASE_URL || 'http://localhost:3000',
-    trace: 'on',               // retain evidence for every permanent test run
+    // Evidence runs force traces with `--trace on` on the CLI (see the
+    // pw-run-automated-tests workflow); tracing every routine run costs
+    // runtime and artifact storage, so keep the default lean.
+    trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },

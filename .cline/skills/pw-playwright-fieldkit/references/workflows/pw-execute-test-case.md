@@ -25,11 +25,15 @@ Classify the source before continuing:
   actions, and observable expected results, stop and route it to
   `pw-design-test-cases.md`.
 - If it is a structured `test-cases.json` produced by this skill, require an
-  explicitly selected case ID and validate approval before execution:
+  explicitly selected case ID and validate approval and the selection before
+  execution. `--case` fails on unknown IDs, and `--flow-skeletons` emits an
+  untranslated flow skeleton per selected automation-candidate case under
+  `report/test-case-run/design/flows/`:
 
   ```bash
   node .cline/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
-    <test-cases.json> --out report/test-case-run/design --require-approved
+    <test-cases.json> --out report/test-case-run/design \
+    --case <TC-ID> --flow-skeletons --require-approved
   ```
 
 - If it is an existing external test case/guide, honor its documented review or
@@ -54,9 +58,13 @@ record the assumption visibly.
 
 Inspect the live UI and existing tests as needed to resolve stable locators and
 setup conventions. Translate the source into
-`report/test-case-run/flow.json`, using the supported `flow.mjs` actions. Every
-documented expected result must become an assertion when Playwright can observe
-it. Do not turn the current product behavior into the expected behavior.
+`report/test-case-run/case-flow.json`, using the supported `flow.mjs` actions;
+when a skeleton was emitted, start from it and replace every step's
+`todo`/`source` pair with one supported action. Do not name the input
+`flow.json` inside the output directory — `flow.mjs` writes its results to
+`<out>/flow.json` and refuses to overwrite its own input. Every documented
+expected result must become an assertion when Playwright can observe it. Do not
+turn the current product behavior into the expected behavior.
 
 If a required action or outcome cannot be represented by `flow.mjs`, use the
 repository's existing Playwright runner only when it can preserve the same
@@ -88,12 +96,12 @@ translated flow with `--trace` in both modes:
 ```bash
 # Headless
 node .cline/skills/pw-playwright-fieldkit/scripts/flow.mjs \
-  report/test-case-run/flow.json \
+  report/test-case-run/case-flow.json \
   --out report/test-case-run --trace
 
 # Headed: add --headed; the agent still performs every action
 node .cline/skills/pw-playwright-fieldkit/scripts/flow.mjs \
-  report/test-case-run/flow.json \
+  report/test-case-run/case-flow.json \
   --out report/test-case-run --trace --headed
 ```
 
@@ -117,12 +125,14 @@ Verify that `report/test-case-run/trace.zip` exists and is non-empty. If trace
 capture failed, fix or rerun it; do not proceed to confirmation without offering
 a trace.
 
-On a graphical desktop, tell the user the viewer will open, launch it, and keep
-the process attached until the user closes it:
+On a graphical desktop, tell the user the viewer will open, then launch it
+detached (in the background) so the blocking viewer process does not stall or
+get killed by the agent's own command timeout. Tell the user to close the
+viewer window when finished:
 
 ```bash
 node .cline/skills/pw-playwright-fieldkit/scripts/node_modules/playwright/cli.js \
-  show-trace report/test-case-run/trace.zip
+  show-trace report/test-case-run/trace.zip &
 ```
 
 If the current agent environment cannot display the viewer, give the user the

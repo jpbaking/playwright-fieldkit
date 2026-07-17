@@ -18,7 +18,12 @@ It does not create permanent automation before confirmation.
 
 If the document only contains feature requirements, stop and use the
 [Feature Specification to Test Cases guide](test-design.md). FieldKit
-case sets must pass the `--require-approved` gate before execution.
+case sets must pass the `--require-approved` gate before execution; the gate
+also rejects a case set that was edited after approval, because approval is
+bound to a content hash. The selected case is validated with `--case <TC-ID>`,
+which fails on unknown IDs, and `--flow-skeletons` gives the agent an
+untranslated per-step skeleton so the browser translation stays anchored to
+the approved wording.
 
 ## Map the source before running
 
@@ -46,12 +51,13 @@ Both modes always capture a Playwright trace.
 
 ## Execute the journey
 
-The approved case is translated to `report/test-case-run/flow.json` and run with
-trace capture:
+The approved case is translated to `report/test-case-run/case-flow.json` and
+run with trace capture (the input is not named `flow.json` because the runner
+writes its results to `<out>/flow.json` and refuses to overwrite its input):
 
 ```bash
 node .cline/skills/pw-playwright-fieldkit/scripts/flow.mjs \
-  report/test-case-run/flow.json \
+  report/test-case-run/case-flow.json \
   --out report/test-case-run --trace
 ```
 

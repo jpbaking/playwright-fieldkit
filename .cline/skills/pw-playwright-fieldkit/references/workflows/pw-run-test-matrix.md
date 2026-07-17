@@ -10,6 +10,11 @@ replace each command with the repository's normal runner invocation. Commands
 are arrays and are executed without shell interpolation. Ensure parallel variants
 have isolated accounts/data and non-colliding artifact paths.
 
+Matrix variants that run permanent tests follow the same trace contract as
+`pw-run-automated-tests.md`: include `--tracing=on` (pytest-playwright) or
+`--trace on` (`@playwright/test`) in each variant's command and report every
+variant's trace paths with its result.
+
 ```bash
 node .cline/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --dry-run
 node .cline/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --out report/matrix

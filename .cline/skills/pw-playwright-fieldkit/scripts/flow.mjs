@@ -13,7 +13,8 @@
 //   --headed             show the browser
 //   --storage-state <f>  auth state JSON
 //   --device <name>      emulate a device, e.g. "iPhone 13"
-//   --trace [file]       capture a Playwright trace (default <out>/trace.zip)
+//   --trace[=file.zip]   capture a Playwright trace (default <out>/trace.zip;
+//                        a relative file resolves under --out)
 //   --gen-test <file>    write a Playwright test; .py selects Python, .ts/.js selects Node
 //   --wait <ms>          settle time after each step        (default 500)
 //   --help
@@ -32,7 +33,7 @@
 //   {"mockAbort":"**/api"} {"auditA11y":"state label"} {"screenshot":"label"}
 
 import { readFileSync } from "node:fs";
-import { dirname } from "node:path";
+import { dirname, isAbsolute, resolve } from "node:path";
 import { launch } from "./lib/browser.mjs";
 import { instrument } from "./lib/instrument.mjs";
 import {
@@ -87,9 +88,21 @@ async function main() {
 
   const outDir = resolveOut(args.out || "playwright-report-flow");
   ensureDir(outDir);
-  const tracePath = args.trace
-    ? (args.trace === true ? join(outDir, "trace.zip") : resolveOut(args.trace))
-    : null;
+  if (resolve(process.cwd(), args._[0]) === join(outDir, "flow.json")) {
+    log.err(`Refusing to run: the results file ${join(outDir, "flow.json")} would overwrite the input flow. Rename the input (e.g. case-flow.json) or use a different --out.`);
+    process.exit(1);
+  }
+  let tracePath = null;
+  if (args.trace !== undefined && args.trace !== false) {
+    if (args.trace === true) {
+      tracePath = join(outDir, "trace.zip");
+    } else if (typeof args.trace === "string" && args.trace.endsWith(".zip")) {
+      tracePath = isAbsolute(args.trace) ? args.trace : join(outDir, args.trace);
+    } else {
+      log.err(`--trace takes no bare value; use --trace (writes <out>/trace.zip) or --trace=<file.zip>. Got: ${JSON.stringify(args.trace)}`);
+      process.exit(1);
+    }
+  }
   if (tracePath) ensureDir(dirname(tracePath));
   const wait = args.wait ?? 500;
   const scope = createScope(args);

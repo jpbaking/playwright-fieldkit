@@ -278,7 +278,7 @@ node .cline/skills/pw-playwright-fieldkit/scripts/flow.mjs <flow.json> [options]
 | `--headed` | off | Show the browser. |
 | `--storage-state <file>` | — | Run the flow logged in. |
 | `--device <name>` | — | Emulate a Playwright device preset. |
-| `--trace [file]` | off | Capture a Playwright trace. With no file, writes `<out>/trace.zip`. |
+| `--trace[=file.zip]` | off | Capture a Playwright trace. Bare `--trace` writes `<out>/trace.zip`; an explicit file must end in `.zip` (a relative path resolves under `--out`). A bare value (`--trace foo`) is rejected to avoid swallowing the flow argument. |
 | `--gen-test <file>` | — | Write a Python test for `.py`, or an `@playwright/test` test for `.ts`/`.js`. Unknown extensions fail. Emission occurs only after the flow **passed**. |
 | `--wait <ms>` | `500` | Settle time after each step. |
 
@@ -287,6 +287,9 @@ choice explicit. The `/pw-generate-tests` workflow first inspects existing test
 code and dependencies, and asks when the convention is missing or ambiguous.
 Python output currently targets pytest with Playwright's synchronous `page`
 fixture. The exit code is `0` if the flow passed and `1` if any step failed.
+Results are written to `<out>/flow.md` and `<out>/flow.json`; the runner refuses
+to start when the input flow *is* `<out>/flow.json`, since the results file
+would overwrite it — name a co-located input `case-flow.json` or similar.
 When `--trace` is set, the trace path is included in `flow.md`, `flow.json`, and
 the command's JSON summary even for a failed flow. Open it with:
 
@@ -404,8 +407,20 @@ node .cline/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
   test-cases-source.json --out report/test-cases
 ```
 
-Use `--require-approved` before executing a FieldKit-generated case set. It
-rejects drafts and approvals that omit a reviewer or retain open questions.
+| Option | Meaning |
+|---|---|
+| `--case <TC-ID>` | Render only the selected case(s); repeatable. An unknown ID is an error. |
+| `--flow-skeletons` | Write an untranslated flow skeleton per rendered automation-candidate case to `<out>/flows/<TC-ID>.json`. Each skeleton step carries the source action and expected result; `flow.mjs` refuses to run it until every step is translated into one supported action. |
+| `--require-approved` | Fail unless `review.status` is `approved`. Use before executing a FieldKit-generated case set. |
+
+Approval is bound to content: the validator reports a `contentHash` (SHA-256
+over everything except the `review` block), and an `approved` document must
+carry a matching `review.approvedHash`. Editing an approved document therefore
+invalidates the approval until it is re-reviewed. The validator also rejects
+approvals that omit a reviewer or retain open questions.
+
+On validation errors the command still writes `test-cases.md`/`test-cases.json`
+with a **Validation errors** section for context, then exits `1`.
 Start from
 [`test-cases.example.json`](../../.cline/skills/pw-playwright-fieldkit/templates/test-cases.example.json).
 
@@ -419,8 +434,15 @@ node .cline/skills/pw-playwright-fieldkit/scripts/coverage.mjs \
   report/explore tests/e2e --out report/coverage
 ```
 
+With `--test-cases <test-cases.json>` (a FieldKit test-case source or rendered
+output), the report adds a requirement-traceability table mapping each
+requirement to its designed cases, automation candidates, and the permanent
+test files that literally mention the requirement or a linked case ID —
+closing the loop from specification to permanent automation.
+
 This is deliberately heuristic: it recognizes literal URLs in common
-navigation and URL-wait/assertion calls. Dynamic routes, fixtures, and helper
+navigation and URL-wait/assertion calls, and literal ID mentions for
+requirement traceability. Dynamic routes, fixtures, and helper
 abstractions may look uncovered and require human review. It is a gap-finding
 aid, not runtime code coverage or a percentage score.
 

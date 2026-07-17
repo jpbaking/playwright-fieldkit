@@ -123,6 +123,11 @@ Verify that the test result and at least one non-empty trace archive exist.
 Retain traces for successful and failed permanent verification runs. Attach the
 permanent-run trace when filing a resulting developer issue.
 
+The scaffold `playwright.config.ts` keeps `trace: 'on-first-retry'` so routine
+development and CI runs stay lean; evidence runs force `--trace on` (or
+`--tracing=on`) on the command line, which overrides the config for every
+selected test.
+
 ## Automation checklist
 
 - Is the source journey approved or confirmed?

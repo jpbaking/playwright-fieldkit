@@ -44,6 +44,10 @@ Apply agreed non-controversial corrections while preserving the original source
 references. Set `review.status` to `ready-for-approval` only when no blocking
 finding remains. Keep disputed items in `openQuestions` or review notes.
 
+Re-run the validator after the final edits and note the `contentHash` it
+reports: approval is bound to that exact content, and any later edit
+invalidates it.
+
 Present the requirement coverage, case counts by type/priority, manual-only
 cases, open questions, and changes made. Then ask:
 
@@ -54,8 +58,12 @@ The agent may recommend approval but must not supply the user's decision.
 
 ## Step 4 — Record and validate the decision
 
-- **Approve:** set `review.status` to `approved`, record the reviewer identity
-  supplied by the user, remove or resolve all open questions, and validate with:
+- **Approve:** first remove or resolve all open questions, re-run the validator,
+  and note the `contentHash` of that final content. Then set `review.status` to
+  `approved`, record the reviewer identity supplied by the user, set
+  `review.approvedHash` to that hash (the hash covers everything except the
+  `review` block, so recording the approval does not change it), and validate
+  with:
 
   ```bash
   node .cline/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
