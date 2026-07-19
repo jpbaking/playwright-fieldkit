@@ -14,15 +14,35 @@ scripts do all the browser work locally.
 
 ## Standard setup
 
-Copy `.cline/skills/pw-playwright-fieldkit/` into that path in the consuming
-project. For Cline, also merge the companion `.clinerules/pw-playwright-fieldkit.md`
-and `.clinerules/workflows/` files into the project. Keep any unrelated rules or
-workflows already present.
+**Preferred — agent-guided.** Paste this into your coding agent from the
+consuming project's root; it merges with existing `AGENTS.md` / `CLAUDE.md` /
+ignore files instead of colliding with them:
+
+```
+Fetch https://raw.githubusercontent.com/jpbaking/playwright-skills/main/AGENT-INSTALL.md and follow its instructions exactly to install Playwright FieldKit into this project. Merge with — never blindly overwrite — any existing AGENTS.md, CLAUDE.md, rule, or ignore files, and report every file you created or changed.
+```
+
+**Script alternative**, from the consuming project's root:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/jpbaking/playwright-skills/main/install.sh | sh
+# Windows: irm https://raw.githubusercontent.com/jpbaking/playwright-skills/main/install.ps1 | iex
+```
+
+Both paths install the canonical package to
+`.agents/skills/pw-playwright-fieldkit/` (Codex, Antigravity, current Cline —
+and the runtime home of the scripts), a byte-identical `.claude/skills/` copy
+for Claude Code, the activation rule to `.agents/rules/`, `.claude/rules/`, and
+`.clinerules/`, generated `/pw-*` shortcut workflows for Cline, and conditional
+`AGENTS.md` / `CLAUDE.md` pointers. All generated adapters are gitignored in
+the consuming project; on a fresh clone, re-run either path to regenerate them
+(the `scripts/node_modules` browser runtime is per-machine anyway). Keep any
+unrelated rules or workflows already present.
 
 Then, from the consuming project root:
 
 ```bash
-cd .cline/skills/pw-playwright-fieldkit/scripts
+cd .agents/skills/pw-playwright-fieldkit/scripts
 npm install                      # installs the `playwright` library
 npx playwright install chromium  # downloads the Chromium engine
 ```
@@ -68,7 +88,7 @@ For an `@playwright/test` suite:
 cd /path/to/your/app
 npm install -D @playwright/test
 npx playwright install chromium
-# copy .cline/skills/pw-playwright-fieldkit/templates/playwright.config.ts to your project root, set baseURL
+# copy .agents/skills/pw-playwright-fieldkit/templates/playwright.config.ts to your project root, set baseURL
 npx playwright test --trace on
 ```
 
@@ -83,15 +103,15 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - name: Install Playwright
-        working-directory: .cline/skills/pw-playwright-fieldkit/scripts
+        working-directory: .agents/skills/pw-playwright-fieldkit/scripts
         run: |
           npm install
           npx playwright install --with-deps chromium
       - name: Run toolkit self-tests
-        working-directory: .cline/skills/pw-playwright-fieldkit/scripts
+        working-directory: .agents/skills/pw-playwright-fieldkit/scripts
         run: npm test
       - name: Crawl staging for regressions
-        run: node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs "$STAGING_URL" --depth 2 --max-pages 40 --out report
+        run: node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs "$STAGING_URL" --depth 2 --max-pages 40 --out report
         env:
           STAGING_URL: ${{ secrets.STAGING_URL }}
       - uses: actions/upload-artifact@v4
@@ -114,11 +134,11 @@ is added to the toolkit's runtime dependencies.
 ```dockerfile
 FROM mcr.microsoft.com/playwright:v1.61.1-jammy
 WORKDIR /work
-COPY .cline/skills/pw-playwright-fieldkit/scripts/package.json .cline/skills/pw-playwright-fieldkit/scripts/package-lock.json .cline/skills/pw-playwright-fieldkit/scripts/
-RUN cd .cline/skills/pw-playwright-fieldkit/scripts && npm ci
+COPY .agents/skills/pw-playwright-fieldkit/scripts/package.json .agents/skills/pw-playwright-fieldkit/scripts/package-lock.json .agents/skills/pw-playwright-fieldkit/scripts/
+RUN cd .agents/skills/pw-playwright-fieldkit/scripts && npm ci
 COPY . .
 # Browsers are preinstalled in this base image.
-ENTRYPOINT ["node", ".cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs"]
+ENTRYPOINT ["node", ".agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs"]
 ```
 
 ```bash
@@ -127,7 +147,7 @@ docker run --rm -v "$PWD/report:/work/report" pw-playwright-fieldkit https://exa
 ```
 
 Match the base-image tag to the exact `playwright` version pinned in
-`.cline/skills/pw-playwright-fieldkit/scripts/package-lock.json`. The package manifest accepts a range, so copying only
+`.agents/skills/pw-playwright-fieldkit/scripts/package-lock.json`. The package manifest accepts a range, so copying only
 `package.json` and running an unlocked install can select a version whose browser
 binary does not match the image.
 

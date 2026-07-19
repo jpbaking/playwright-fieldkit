@@ -62,7 +62,7 @@ thinking.
 ## See it in action
 
 ```console
-$ node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://quotes.toscrape.com --depth 1 --max-pages 8 --out report/explore
+$ node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://quotes.toscrape.com --depth 1 --max-pages 8 --out report/explore
 
 i Crawling https://quotes.toscrape.com/ (depth 1, max 8 pages, chromium)
 ✓ Visited 8 pages. 0 pages with errors, 1 forms.
@@ -87,26 +87,36 @@ project's existing language.
 
 ## Quick start
 
-Copy `.cline/skills/pw-playwright-fieldkit/` into the same path in your project.
-For Cline's activation fallback and shortcuts, also merge
-`.clinerules/pw-playwright-fieldkit.md` and `.clinerules/workflows/` into the
-project; do not replace unrelated rules already there. Then, from the project
-root:
+**Preferred: let your AI agent install it.** An agent merges with whatever your project already has — existing `AGENTS.md` / `CLAUDE.md` content, ignore rules, same-named skills — instead of colliding with it. Paste this into your coding agent from the project root:
+
+```
+Fetch https://raw.githubusercontent.com/jpbaking/playwright-skills/main/AGENT-INSTALL.md and follow its instructions exactly to install Playwright FieldKit into this project. Merge with — never blindly overwrite — any existing AGENTS.md, CLAUDE.md, rule, or ignore files, and report every file you created or changed.
+```
+
+**Alternative: the script installer**, from the project root:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/jpbaking/playwright-skills/main/install.sh | sh
+# Windows: irm https://raw.githubusercontent.com/jpbaking/playwright-skills/main/install.ps1 | iex
+```
+
+Both paths install the canonical package from [`skills/shared/pw-playwright-fieldkit/`](skills/shared/pw-playwright-fieldkit/) to `.agents/skills/pw-playwright-fieldkit/` (Codex, Google Antigravity, current Cline — and the runtime home of the scripts) with a byte-identical `.claude/skills/` copy for Claude Code, install the always-on activation rule per harness, generate the Cline `/pw-*` workflow shortcuts, add conditional `AGENTS.md` / `CLAUDE.md` pointers, and gitignore the generated adapters. Then, from the project root:
 
 ```bash
 # 1. Install the browser engine (once)
-(cd .cline/skills/pw-playwright-fieldkit/scripts && npm install && npx playwright install chromium)
+(cd .agents/skills/pw-playwright-fieldkit/scripts && npm install && npx playwright install chromium)
 
 # 2. Map a site
-node .cline/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://your-app.example.com --depth 2 --max-pages 40
+node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://your-app.example.com --depth 2 --max-pages 40
 
 # 3. Read playwright-report-explore/report.md — or just ask Cline to "/pw-explore-site"
 ```
 
-If you use **Cline**, the canonical package lives in
-`.cline/skills/pw-playwright-fieldkit/`. A small always-on rule helps weaker models
-activate it from natural-language requests, while the familiar workflows remain
-available as explicit shortcuts:
+The installed package lives in `.agents/skills/pw-playwright-fieldkit/`. A small
+always-on rule helps weaker models activate it from natural-language requests,
+and the familiar workflows remain available as explicit shortcuts (shown as
+Cline/Claude slash commands below; Codex reaches the same playbooks through the
+skill):
 
 - *"Explore my site at localhost:3000 and tell me what's broken"* → `/pw-explore-site`
 - *"The save button throws an error, debug it"* → `/pw-debug-site`
@@ -126,7 +136,7 @@ flake triage. The [User Guide](docs/user-guide.md) routes beginners to a focused
 guide for each workflow set.
 
 Using another coding-agent harness? Keep the canonical skill at
-`.cline/skills/pw-playwright-fieldkit/` and point that harness's repository rule or
+`.agents/skills/pw-playwright-fieldkit/` and point that harness's repository rule or
 native skill adapter at its `SKILL.md`. The
 [Agent Harness Guide](docs/setup/agent-harness.md) has the portable adapter
 prompt, shortcut mapping, capability requirements, and smoke test.
@@ -137,7 +147,7 @@ prompt, shortcut mapping, capability requirements, and smoke test.
 
 ```
 pw-playwright-fieldkit/
-├── .cline/skills/pw-playwright-fieldkit/
+├── .agents/skills/pw-playwright-fieldkit/
 │   ├── SKILL.md             # Intent routing, operating guidance, safety
 │   ├── scripts/             # Deterministic browser engine + regression suite
 │   │   ├── crawl.mjs
@@ -153,7 +163,8 @@ pw-playwright-fieldkit/
 │   │   └── triage.mjs
 │   ├── templates/           # Flow, charter, matrix, data, spec, and page-object scaffolds
 │   └── references/workflows/ # Detailed workflow playbooks
-├── .clinerules/             # Always-on activation rule + browser/QE shortcuts
+├── rules/shared/            # Always-on activation rule (installed per harness)
+├── install.sh, install.ps1, AGENT-INSTALL.md  # Project-scoped installers
 └── docs/
     ├── user-guide.md        # Single product and workflow entry point
     ├── qe/                  # Focused QE workflow-set guides
@@ -167,11 +178,11 @@ pw-playwright-fieldkit/
 
 - **Node.js 18+**
 - **Playwright** (`npm install && npx playwright install chromium` in
-  `.cline/skills/pw-playwright-fieldkit/scripts/`)
+  `.agents/skills/pw-playwright-fieldkit/scripts/`)
 - A coding agent that can run shell commands and read files (Cline, or any
   similar agent). **No web-search/fetch capability is needed.**
 
-Run the bundled localhost regression suite with `cd .cline/skills/pw-playwright-fieldkit/scripts && npm test`.
+Run the bundled localhost regression suite with `cd .agents/skills/pw-playwright-fieldkit/scripts && npm test`.
 
 ---
 

@@ -100,7 +100,7 @@ assessment and use the project's axe fixtures when available.
 The confirmed flow is executed with a journey trace while generating code:
 
 ```bash
-node .cline/skills/pw-playwright-fieldkit/scripts/flow.mjs confirmed-flow.json \
+node .agents/skills/pw-playwright-fieldkit/scripts/flow.mjs confirmed-flow.json \
   --out report/tests/login --trace \
   --gen-test tests/e2e/test_login.py
 ```

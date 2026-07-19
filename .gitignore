@@ -1,7 +1,7 @@
 # Playwright runtime + exploration output — never commit these.
-# (Keep .cline/skills/pw-playwright-fieldkit/scripts/package-lock.json tracked for reproducible installs.)
+# (Keep skills/shared/pw-playwright-fieldkit/scripts/package-lock.json tracked for reproducible installs.)
 node_modules/
-.cline/skills/pw-playwright-fieldkit/scripts/node_modules/
+skills/shared/pw-playwright-fieldkit/scripts/node_modules/
 .env
 .env.*
 !.env.example
