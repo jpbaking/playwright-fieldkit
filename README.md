@@ -90,14 +90,14 @@ project's existing language.
 **Preferred: let your AI agent install it.** An agent merges with whatever your project already has — existing `AGENTS.md` / `CLAUDE.md` content, ignore rules, same-named skills — instead of colliding with it. Paste this into your coding agent from the project root:
 
 ```
-Fetch https://raw.githubusercontent.com/jpbaking/playwright-skills/main/AGENT-INSTALL.md and follow its instructions exactly to install Playwright FieldKit into this project. Merge with — never blindly overwrite — any existing AGENTS.md, CLAUDE.md, rule, or ignore files, and report every file you created or changed.
+Fetch https://raw.githubusercontent.com/jpbaking/playwright-fieldkit/main/AGENT-INSTALL.md and follow its instructions exactly to install Playwright FieldKit into this project. Merge with — never blindly overwrite — any existing AGENTS.md, CLAUDE.md, rule, or ignore files, and report every file you created or changed.
 ```
 
 **Alternative: the script installer**, from the project root:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/jpbaking/playwright-skills/main/install.sh | sh
-# Windows: irm https://raw.githubusercontent.com/jpbaking/playwright-skills/main/install.ps1 | iex
+curl -fsSL https://raw.githubusercontent.com/jpbaking/playwright-fieldkit/main/install.sh | sh
+# Windows: irm https://raw.githubusercontent.com/jpbaking/playwright-fieldkit/main/install.ps1 | iex
 ```
 
 Both paths install the canonical package from [`skills/shared/pw-playwright-fieldkit/`](skills/shared/pw-playwright-fieldkit/) to `.agents/skills/pw-playwright-fieldkit/` (Codex, Google Antigravity, current Cline — and the runtime home of the scripts) with a byte-identical `.claude/skills/` copy for Claude Code, install the always-on activation rule per harness, generate the Cline `/pw-*` workflow shortcuts, add conditional `AGENTS.md` / `CLAUDE.md` pointers, and gitignore the generated adapters. Then, from the project root:

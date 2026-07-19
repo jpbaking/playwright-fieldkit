@@ -3,7 +3,7 @@
 # Installs the portable pw-playwright-fieldkit Agent Skill, the always-on
 # activation rule, and generated Cline workflow shortcuts for Codex,
 # Claude Code, Google Antigravity, and Cline. Run from a project root:
-#   irm https://raw.githubusercontent.com/jpbaking/playwright-skills/main/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/jpbaking/playwright-fieldkit/main/install.ps1 | iex
 #
 # Prefer the agent-guided install (AGENT-INSTALL.md) when an AI agent is
 # available. Override the source with $env:PW_FIELDKIT_REPO,
@@ -11,7 +11,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$Repo = if ($env:PW_FIELDKIT_REPO) { $env:PW_FIELDKIT_REPO } else { "jpbaking/playwright-skills" }
+$Repo = if ($env:PW_FIELDKIT_REPO) { $env:PW_FIELDKIT_REPO } else { "jpbaking/playwright-fieldkit" }
 $Ref  = if ($env:PW_FIELDKIT_REF)  { $env:PW_FIELDKIT_REF }  else { "main" }
 $Skill = "pw-playwright-fieldkit"
 $Staging = $null
@@ -86,7 +86,7 @@ If ``.agents/rules/pw-playwright-fieldkit.md`` exists, follow it: requests to
 explore, debug, audit, record, compare, or automate a live web application go
 through the ``pw-playwright-fieldkit`` skill. If the rule or skill is missing
 (fresh clone -- the adapters are gitignored), re-run the installer from
-https://github.com/jpbaking/playwright-skills. Only operate on authorized
+https://github.com/jpbaking/playwright-fieldkit. Only operate on authorized
 targets.
 "@
     if (-not (Has-Text "AGENTS.md" $Skill)) {

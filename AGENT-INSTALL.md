@@ -5,7 +5,7 @@ the current working directory. Follow these steps exactly. This procedure is
 merge-aware: it never blindly overwrites files the project already owns, which
 is why it is preferred over the script installers.
 
-Source repository: `https://github.com/jpbaking/playwright-skills`. If the
+Source repository: `https://github.com/jpbaking/playwright-fieldkit`. If the
 user named a fork or tag, substitute it below.
 
 ## 1. Survey before writing
@@ -22,7 +22,7 @@ user named a fork or tag, substitute it below.
 
 Obtain the repository's `skills/shared/pw-playwright-fieldkit/` tree — clone
 with `git clone --depth 1`, or download the tarball
-(`https://codeload.github.com/jpbaking/playwright-skills/tar.gz/main`). Copy
+(`https://codeload.github.com/jpbaking/playwright-fieldkit/tar.gz/main`). Copy
 the whole directory (SKILL.md, `references/`, `scripts/`, `templates/`,
 `agents/`), replacing any existing same-named directory, to BOTH:
 
@@ -65,7 +65,7 @@ Never copy `scripts/node_modules` — it is a per-machine npm artifact.
   > to explore, debug, audit, record, compare, or automate a live web
   > application go through the `pw-playwright-fieldkit` skill. If the rule or
   > skill is missing (fresh clone — the adapters are gitignored), re-run the
-  > installer from https://github.com/jpbaking/playwright-skills. Only
+  > installer from https://github.com/jpbaking/playwright-fieldkit. Only
   > operate on authorized targets.
 
 - `CLAUDE.md`: if missing, create it containing only `@AGENTS.md`. If it

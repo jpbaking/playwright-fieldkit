@@ -19,14 +19,14 @@ consuming project's root; it merges with existing `AGENTS.md` / `CLAUDE.md` /
 ignore files instead of colliding with them:
 
 ```
-Fetch https://raw.githubusercontent.com/jpbaking/playwright-skills/main/AGENT-INSTALL.md and follow its instructions exactly to install Playwright FieldKit into this project. Merge with — never blindly overwrite — any existing AGENTS.md, CLAUDE.md, rule, or ignore files, and report every file you created or changed.
+Fetch https://raw.githubusercontent.com/jpbaking/playwright-fieldkit/main/AGENT-INSTALL.md and follow its instructions exactly to install Playwright FieldKit into this project. Merge with — never blindly overwrite — any existing AGENTS.md, CLAUDE.md, rule, or ignore files, and report every file you created or changed.
 ```
 
 **Script alternative**, from the consuming project's root:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/jpbaking/playwright-skills/main/install.sh | sh
-# Windows: irm https://raw.githubusercontent.com/jpbaking/playwright-skills/main/install.ps1 | iex
+curl -fsSL https://raw.githubusercontent.com/jpbaking/playwright-fieldkit/main/install.sh | sh
+# Windows: irm https://raw.githubusercontent.com/jpbaking/playwright-fieldkit/main/install.ps1 | iex
 ```
 
 Both paths install the canonical package to
