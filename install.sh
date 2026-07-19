@@ -124,8 +124,8 @@ GI_MARK="# Playwright FieldKit installer-managed agent adapters (generated; do n
 if has_text ".gitignore" "$GI_MARK"; then
   echo "  = kept existing .gitignore Playwright FieldKit block"
 else
+  if [ -s .gitignore ]; then printf '\n' >> .gitignore; fi
   {
-    [ -s .gitignore ] && printf '\n'
     printf '%s\n' "$GI_MARK"
     printf '.agents/skills/%s/\n.claude/skills/%s/\n' "$SKILL" "$SKILL"
     printf '.agents/rules/%s.md\n.claude/rules/%s.md\n.clinerules/%s.md\n' "$SKILL" "$SKILL" "$SKILL"
