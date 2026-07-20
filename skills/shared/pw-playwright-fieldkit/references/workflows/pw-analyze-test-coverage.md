@@ -4,7 +4,7 @@ Create a representative crawl for the same role/environment as the test suite,
 then locate the existing Python or Node E2E roots. Run:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/coverage.mjs report/explore tests/e2e --out report/coverage
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/coverage.mjs report/explore tests/e2e --out report/coverage
 ```
 
 When a specification-derived case set exists, add

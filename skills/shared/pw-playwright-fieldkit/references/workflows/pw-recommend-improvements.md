@@ -5,7 +5,7 @@ improvements across reliability, accessibility, UX, and testability.
 
 ## Step 1 — Gather evidence
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 2 --max-pages 40 --out report/audit
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 2 --max-pages 40 --out report/audit
 ```
 Read section 7, **Deterministic quality audit**, first. Then `inspect.mjs` a few
 representative pages with `--wait 2000` for deeper accessibility-tree and console

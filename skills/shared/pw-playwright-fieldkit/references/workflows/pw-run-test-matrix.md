@@ -5,7 +5,7 @@ test across every combination. Select variants that exercise a real role,
 engine, viewport/device, locale, or timezone risk; keep a fast primary variant
 for ordinary feedback.
 
-Copy `.agents/skills/pw-playwright-fieldkit/templates/matrix.example.json`, then
+Copy `~/.agents/skills/pw-playwright-fieldkit/templates/matrix.example.json`, then
 replace each command with the repository's normal runner invocation. Commands
 are arrays and are executed without shell interpolation. Ensure parallel variants
 have isolated accounts/data and non-colliding artifact paths.
@@ -16,8 +16,8 @@ Matrix variants that run permanent tests follow the same trace contract as
 variant's trace paths with its result.
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --dry-run
-node .agents/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --out report/matrix
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --dry-run
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --out report/matrix
 ```
 
 Report failures per variant; distinguish product differences from unsupported

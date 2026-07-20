@@ -8,11 +8,11 @@ Ask the user for the **start URL** if they didn't give one. Then:
 ## Step 1 — Setup check
 If you have not run the tools yet this session, confirm Playwright is installed.
 If a script errors with `Playwright is not installed`, tell the user to run
-`(cd .agents/skills/pw-playwright-fieldkit/scripts && npm install && npx playwright install chromium)` and stop until done.
+`(cd ~/.agents/skills/pw-playwright-fieldkit/scripts && npm install && npx playwright install chromium)` and stop until done.
 
 ## Step 2 — Crawl
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 2 --max-pages 40 --out report/explore
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 2 --max-pages 40 --out report/explore
 ```
 - If the site is large, keep `--depth 2` but raise `--max-pages` gradually.
 - To stay inside one section, add `--same-path` or `--include "^/docs"`.
@@ -41,7 +41,7 @@ Open `report/explore/report.md`. It has eight sections:
 ## Step 4 — Drill into anything flagged
 For every page listed under **Problems found**, run:
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <THAT_URL> --wait 1500 --out report/inspect
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <THAT_URL> --wait 1500 --out report/inspect
 ```
 and read `report/inspect/inspect.md` for the full console + network detail.
 

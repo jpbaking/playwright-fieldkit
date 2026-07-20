@@ -60,14 +60,14 @@ from an authoritative source.
 ## Step 4 — Create and validate the draft artifact
 
 Copy and adapt
-`.agents/skills/pw-playwright-fieldkit/templates/test-cases.example.json`. Set
+`~/.agents/skills/pw-playwright-fieldkit/templates/test-cases.example.json`. Set
 `review.status` to `draft` and write the working source outside the skill package,
 for example `report/test-cases/test-cases-source.json`.
 
 Validate and render it:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
   report/test-cases/test-cases-source.json --out report/test-cases
 ```
 

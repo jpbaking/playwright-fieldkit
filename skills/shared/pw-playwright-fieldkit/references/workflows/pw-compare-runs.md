@@ -9,14 +9,14 @@ options** (depth, max-pages, filters) for both so the diff is apples-to-apples.
 
 **Before/after a change (regression check):**
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL> --depth 2 --max-pages 40 --out report/before
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL> --depth 2 --max-pages 40 --out report/before
 # ...deploy / make the change...
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL> --depth 2 --max-pages 40 --out report/after
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL> --depth 2 --max-pages 40 --out report/after
 ```
 **Logged-out vs logged-in / role vs role (feature discovery):**
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL> --out report/anon
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL> --storage-state auth.json --out report/auth
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL> --out report/anon
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL> --storage-state auth.json --out report/auth
 ```
 The comparator matches exact absolute URLs, so do not compare different origins
 (such as staging and production) without first normalizing the crawl data.
@@ -26,7 +26,7 @@ The comparator matches exact absolute URLs, so do not compare different origins
 
 ## Step 2 — Compare
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/compare.mjs report/before report/after --out report/diff
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/compare.mjs report/before report/after --out report/diff
 ```
 (You can pass either the directory or its `crawl.json`.) Read
 `report/diff/compare.md`. It reports:

@@ -7,10 +7,10 @@ test data/matrices, analyze coverage, generate negative paths, create a test
 charter, triage a flaky test, or understand a live website, activate the
 `pw-playwright-fieldkit` skill. If
 automatic skill activation is unavailable or missed, read and follow
-`.agents/skills/pw-playwright-fieldkit/SKILL.md` directly. If that file is
-missing (fresh clone — installed adapters are gitignored), tell the user to
-re-run the Playwright FieldKit installer from
-https://github.com/jpbaking/playwright-fieldkit.
+`~/.agents/skills/pw-playwright-fieldkit/SKILL.md` directly. If that file is
+missing, the toolkit is an optional user-global install — offer to install
+it from https://github.com/jpbaking/playwright-fieldkit and proceed only if
+the user agrees.
 
 Apply the matching workflow immediately; do not merely tell the user which
 shortcut they could run.

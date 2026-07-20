@@ -5,7 +5,7 @@ role-gated pages, admin tools, and interactive widgets a user might miss.
 
 ## Step 1 — Crawl broadly, logged out
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 3 --max-pages 60 --out report/discover
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 3 --max-pages 60 --out report/discover
 ```
 Read `report/discover/report.md` → **section 4, "Possibly undocumented / gated
 features"**. It lists:
@@ -19,13 +19,13 @@ dialogs, switches, file uploads, search).
 ## Step 2 — Crawl again, logged in
 Many features only appear once authenticated or with a privileged role.
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/save-auth.mjs <LOGIN_URL> --headed --out auth.json      # log in once
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 3 --max-pages 60 \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/save-auth.mjs <LOGIN_URL> --headed --out auth.json      # log in once
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 3 --max-pages 60 \
      --storage-state auth.json --out report/discover-auth
 ```
 Then **diff the two crawls automatically** — don't compare by hand:
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/compare.mjs report/discover report/discover-auth --out report/gated
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/compare.mjs report/discover report/discover-auth --out report/gated
 ```
 `report/gated/compare.md` lists exactly the **new pages, new forms, and structural
 changes** that appear only when logged in — those are the gated features. For
@@ -40,7 +40,7 @@ a path there often marks an internal/admin area worth probing with auth.
 ## Step 3 — Probe the candidates
 For each hidden/gated route you found, inspect it directly:
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <HIDDEN_URL> --storage-state auth.json --wait 1500
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <HIDDEN_URL> --storage-state auth.json --wait 1500
 ```
 - A `200` with real content = a working, possibly undocumented feature.
 - A `403`/redirect to login = gated; note what role/flag it needs.

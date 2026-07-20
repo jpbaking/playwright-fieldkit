@@ -18,7 +18,7 @@ add `mockResponse` or `mockAbort` before navigation in a flow:
 ]
 ```
 
-See `.agents/skills/pw-playwright-fieldkit/templates/negative-flow.example.json`.
+See `~/.agents/skills/pw-playwright-fieldkit/templates/negative-flow.example.json`.
 Run the flow and generate a project-language test only after it passes. Assert
 both the visible failure handling and protected invariants (no charge, no lost
 input, unchanged total). Avoid mocking the happy path so heavily that the test

@@ -10,25 +10,25 @@ Playwright code for operations already supported here.
 
 ## Package paths
 
-Use this project-skill root:
+The scripts have one runtime home, the user-global skill root (installed for
+every harness; if this SKILL.md was discovered elsewhere, still run the
+scripts from here):
 
 ```text
-.agents/skills/pw-playwright-fieldkit
+~/.agents/skills/pw-playwright-fieldkit
 ```
 
-Run tools from the workspace root, for example:
+Run tools from the project/workspace root so reports land in the project,
+for example:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL> --out report/explore
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <URL> --out report/explore
 ```
 
-Install once if needed:
+Install the runtime dependencies once per machine if needed:
 
 ```bash
-cd .agents/skills/pw-playwright-fieldkit/scripts
-npm ci
-npx playwright install chromium
-cd ../../../..
+(cd ~/.agents/skills/pw-playwright-fieldkit/scripts && npm ci && npx playwright install chromium)
 ```
 
 ## Route the request
@@ -60,9 +60,8 @@ genuinely crosses intents.
 - Compare before/after, anonymous/authenticated, or role-based crawls: [pw-compare-runs](references/workflows/pw-compare-runs.md)
 
 Natural-language intent is sufficient; do not require the user to type a slash
-command. Installer-generated shortcut files (for example Cline's
-`.clinerules/workflows/pw-*.md`) delegate into these same canonical
-references.
+command. Install-generated shortcut files (for example Cline's global
+`pw-*.md` workflow stubs) delegate into these same canonical references.
 
 ## Tools
 
@@ -105,5 +104,5 @@ Keep generated reports in the workspace, not inside the skill package.
 
 - Human documentation remains in workspace `docs/`.
 - Test scaffolds and flow examples are in
-  `.agents/skills/pw-playwright-fieldkit/templates/`.
+  `~/.agents/skills/pw-playwright-fieldkit/templates/`.
 - The localhost regression suite is under the bundled `scripts/test/` directory.

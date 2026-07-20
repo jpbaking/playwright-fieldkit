@@ -1,108 +1,140 @@
 # Playwright FieldKit — agent-guided install
 
-You are an AI coding agent installing Playwright FieldKit into the project at
-the current working directory. Follow these steps exactly. This procedure is
-merge-aware: it never blindly overwrites files the project already owns, which
-is why it is preferred over the script installers.
+You are an AI coding agent installing Playwright FieldKit. Follow these
+steps exactly. This procedure is merge-aware — it never blindly overwrites
+files the user already owns — and it is the only install path; there are no
+install scripts.
+
+Playwright FieldKit is a **user-global** toolkit: the skill, its bundled
+scripts, and the rule install once per user. Nothing is installed into
+projects; reports and generated tests the scripts produce land in whatever
+project the user runs them from, following that project's own policy.
+
+The user-global skill root `~/.agents/skills/pw-playwright-fieldkit/` is the
+**single scripts runtime**: it is always installed (whatever harnesses are
+selected), and every other harness copy points its script commands there, so
+`node_modules` and the Playwright browsers exist in exactly one place.
 
 Source repository: `https://github.com/jpbaking/playwright-fieldkit`. If the
 user named a fork or tag, substitute it below.
 
-## 1. Survey before writing
+## 1. Acquire the sources
 
-1. Confirm you are at the target project's root.
-2. Note whether these exist: `AGENTS.md`, `CLAUDE.md`, `.gitignore`, and
-   Node.js 18+ (`node --version`) — the toolkit's scripts need it at runtime.
-3. Check for a same-named `pw-playwright-fieldkit` skill under
-   `.agents/skills/`, `.claude/skills/`, `.cline/skills/`, and the
-   user-global equivalents, plus existing `.clinerules/workflows/pw-*.md`
-   files. Report anything you find.
+Obtain the sources in a temporary directory (never inside a project):
 
-## 2. Install the skill
+- `git clone --depth 1 https://github.com/jpbaking/playwright-fieldkit <tmp>/playwright-fieldkit`
+  (add `--branch <tag>` for a pinned tag), or
+- download and extract `https://github.com/jpbaking/playwright-fieldkit/archive/refs/heads/main.zip`
+  (or the tarball `https://codeload.github.com/jpbaking/playwright-fieldkit/tar.gz/main`), or
+- `gh repo clone jpbaking/playwright-fieldkit <tmp>/playwright-fieldkit`.
 
-Obtain the repository's `skills/shared/pw-playwright-fieldkit/` tree — clone
-with `git clone --depth 1`, or download the tarball
-(`https://codeload.github.com/jpbaking/playwright-fieldkit/tar.gz/main`). Copy
-the whole directory (SKILL.md, `references/`, `scripts/`, `templates/`,
-`agents/`), replacing any existing same-named directory, to BOTH:
+Copy from this staging directory below; delete it when done.
 
-- `.agents/skills/pw-playwright-fieldkit/` — Codex, Antigravity, current
-  Cline, and the single runtime home of the scripts;
-- `.claude/skills/pw-playwright-fieldkit/` — Claude Code's discovery copy
-  (byte-identical; the script commands inside it point at the `.agents`
-  copy, so scripts execute in one place).
+## 2. Survey before writing
 
-Never copy `scripts/node_modules` — it is a per-machine npm artifact.
+1. Check Node.js 18+ is available (`node --version`) — the scripts need it
+   at runtime. Report if missing; the install can proceed but the scripts
+   will not run.
+2. Check for a same-named `pw-playwright-fieldkit` skill in the global
+   directories listed below and, if inside a project, under its
+   `.agents/skills/`, `.claude/skills/`, `.cline/skills/`, plus legacy
+   project-level `.clinerules/workflows/pw-*.md` files. Report anything you
+   find; a project-level copy can shadow or duplicate the global install.
 
-## 3. Install the rule and Cline shortcuts
+## 3. Install the skill
+
+Copy the whole `skills/shared/pw-playwright-fieldkit/` directory (SKILL.md,
+`references/`, `scripts/`, `templates/`, `agents/`), replacing any existing
+same-named directory, to:
+
+- `~/.agents/skills/pw-playwright-fieldkit/` — **always** (Codex discovery
+  and the single scripts runtime), preserving an existing
+  `scripts/node_modules/` there if present (it is a per-machine npm
+  artifact; never copy one from staging);
+
+and, for each additional harness the user selects (all is a safe default),
+a byte-identical copy **without** `scripts/node_modules`:
+
+| Harness | Destination |
+| --- | --- |
+| Claude Code | `~/.claude/skills/pw-playwright-fieldkit/` |
+| Antigravity | `~/.gemini/config/skills/pw-playwright-fieldkit/` |
+| Cline | `~/.cline/skills/pw-playwright-fieldkit/` |
+
+Cursor needs **no separate copy**: it natively discovers `~/.agents/skills/`
+(and `~/.claude/skills/` / `~/.codex/skills/` as compatibility paths). Do
+not install to `~/.cursor/skills/` — that would create a duplicate.
+
+The SKILL.md instructs agents to run all scripts from the
+`~/.agents/skills/...` runtime home regardless of which copy was
+discovered, so the extra copies never need their own dependencies.
+
+## 4. Install the rule and Cline workflow shortcuts
+
+The rule is an intent router; it triggers on live-website work, not on
+project state, and is safe to load globally.
 
 1. Copy `rules/shared/pw-playwright-fieldkit.md` to
-   `.agents/rules/`, `.claude/rules/`, and `.clinerules/` (identical copies).
-   Never write to `.codex/rules`.
-2. For each playbook
-   `.agents/skills/pw-playwright-fieldkit/references/workflows/pw-<name>.md`,
-   generate a Cline shortcut `.clinerules/workflows/pw-<name>.md` containing:
+   `~/.agents/rules/pw-playwright-fieldkit.md` and
+   `~/.gemini/config/rules/pw-playwright-fieldkit.md`.
+2. Cline: copy it to `~/Cline/Rules/pw-playwright-fieldkit.md` on Linux, or
+   `~/Documents/Cline/Rules/pw-playwright-fieldkit.md` on macOS/Windows (if
+   both exist, use the populated one).
+3. Codex and Claude Code: append this marker-guarded block once (skip if the
+   marker is present) to both `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md`
+   (create either if missing; merge, never overwrite):
+
+   ```markdown
+   <!-- playwright-fieldkit:global-rule -->
+   For requests to explore, debug, audit, record, compare, or test a live
+   web application, read and follow
+   `~/.agents/rules/pw-playwright-fieldkit.md` (it routes into the
+   `pw-playwright-fieldkit` skill). Only operate on authorized targets.
+   <!-- /playwright-fieldkit:global-rule -->
+   ```
+
+4. If Cline is selected, generate a global workflow stub for each playbook
+   `~/.agents/skills/pw-playwright-fieldkit/references/workflows/pw-<name>.md`
+   at `~/Cline/Workflows/pw-<name>.md` (Linux; `~/Documents/Cline/Workflows/`
+   on macOS/Windows) containing:
 
    > # /pw-\<name\>
    >
    > Activate the `pw-playwright-fieldkit` skill (or read
-   > `.agents/skills/pw-playwright-fieldkit/SKILL.md`), then read and follow
-   > `.agents/skills/pw-playwright-fieldkit/references/workflows/pw-<name>.md`.
+   > `~/.agents/skills/pw-playwright-fieldkit/SKILL.md`), then read and follow
+   > `~/.agents/skills/pw-playwright-fieldkit/references/workflows/pw-<name>.md`.
    >
    > Execute the workflow now; do not merely suggest this shortcut to the user.
 
-   Skip this step if the user's project does not use Cline.
+Cursor has no file-based global rules (User Rules are app settings). If
+the user works in Cursor, print the pointer block above and ask them to
+paste it into Cursor Settings → Rules once.
 
-## 4. Bridge files — merge, never overwrite
+Never write to `~/.codex/rules` or any `.codex/rules` — that path holds
+command-execution policy, not guidance.
 
-- `AGENTS.md`: if it already mentions `pw-playwright-fieldkit`, leave it.
-  Otherwise create it (heading `# Project rules`) if missing, then append this
-  section once, preserving all existing content:
-
-  > ## Playwright FieldKit
-  >
-  > If `.agents/rules/pw-playwright-fieldkit.md` exists, follow it: requests
-  > to explore, debug, audit, record, compare, or automate a live web
-  > application go through the `pw-playwright-fieldkit` skill. If the rule or
-  > skill is missing (fresh clone — the adapters are gitignored), re-run the
-  > installer from https://github.com/jpbaking/playwright-fieldkit. Only
-  > operate on authorized targets.
-
-- `CLAUDE.md`: if missing, create it containing only `@AGENTS.md`. If it
-  exists and already imports `AGENTS.md` or mentions the skill, leave it;
-  otherwise prepend the `@AGENTS.md` line once and preserve the rest.
-- If the project uses `GEMINI.md`, apply the same merge logic there.
-
-## 5. Gitignore the generated adapters
-
-Add this block to `.gitignore` once (skip if the marker line already exists);
-create the file if missing and never delete existing rules:
-
-```gitignore
-# Playwright FieldKit installer-managed agent adapters (generated; do not edit or commit)
-.agents/skills/pw-playwright-fieldkit/
-.claude/skills/pw-playwright-fieldkit/
-.agents/rules/pw-playwright-fieldkit.md
-.claude/rules/pw-playwright-fieldkit.md
-.clinerules/pw-playwright-fieldkit.md
-.clinerules/workflows/pw-*.md
-```
-
-Do NOT gitignore `AGENTS.md`, `CLAUDE.md`, or the project's generated test
-files and reports the toolkit produces — those follow the project's own
-policy. On a fresh clone the adapters are absent; the conditional bridge text
-degrades safely, and re-running this procedure (or `install.sh`) regenerates
-them.
-
-## 6. Set up the browser runtime, validate, and report
+## 5. Set up the browser runtime, validate, and report
 
 1. Offer to run (or instruct the user to run):
-   `(cd .agents/skills/pw-playwright-fieldkit/scripts && npm install && npx playwright install chromium)`
-2. Verify the `.agents` and `.claude` skill copies are byte-identical
-   (excluding any `node_modules`), and the three rule copies match.
-3. Report every file created, changed, or intentionally left alone, plus
-   collisions from step 1.
-4. Tell the user: ask their agent to use the `pw-playwright-fieldkit` skill
+   `(cd ~/.agents/skills/pw-playwright-fieldkit/scripts && npm install && npx playwright install chromium)`
+2. Verify all harness skill copies are byte-identical to the canonical
+   source (excluding any `node_modules`), and the rule copies match.
+3. Remove the temporary staging directory.
+4. Report every file created, changed, or intentionally left alone, plus
+   collisions from step 2 (suggest deleting legacy gitignored project-level
+   adapters or `.clinerules/workflows/pw-*.md` stubs only with user
+   approval). Note the install is per-user and per-machine.
+5. Tell the user: ask their agent to use the `pw-playwright-fieldkit` skill
    (e.g. "explore my site at localhost:3000 and tell me what's broken");
    Cline/Claude also expose `/pw-*` shortcuts, Codex uses a `$` skill
    mention. Remind them the toolkit only operates on authorized targets.
+
+## Project-level adapter install (opt-in only)
+
+Only on explicit user request: copy the skill directory to the project's
+`.agents/skills/` and `.claude/skills/` and the rule to `.agents/rules/`,
+`.claude/rules/`, and `.clinerules/`. Even then, keep script execution
+pointed at the global `~/.agents/skills/...` runtime home. Whether the
+team commits or gitignores the adapters is the project's own policy — never
+touch the project's `.gitignore` yourself; if existing ignore rules hide the
+adapters from a harness, report the exact pattern instead of changing it.

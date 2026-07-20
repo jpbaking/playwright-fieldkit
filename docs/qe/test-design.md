@@ -80,7 +80,7 @@ The validator checks unique IDs, known requirement links, actions and expected
 results, destructive cleanup, coverage warnings, and review status:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
   report/test-cases/test-cases-source.json --out report/test-cases
 ```
 
@@ -115,7 +115,7 @@ until it is re-reviewed. Approved artifacts require a reviewer, the matching
 hash, and no open questions:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
   report/test-cases/test-cases-source.json --out report/test-cases \
   --require-approved
 ```

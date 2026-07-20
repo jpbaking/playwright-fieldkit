@@ -33,7 +33,7 @@ export async function launch(opts = {}) {
   }
 
   if (opts.storageState && !existsSync(opts.storageState)) {
-    log.err(`Auth state file not found: ${opts.storageState}. Create it first with:  node .agents/skills/pw-playwright-fieldkit/scripts/save-auth.mjs <loginUrl> --headed --out ${opts.storageState}`);
+    log.err(`Auth state file not found: ${opts.storageState}. Create it first with:  node ~/.agents/skills/pw-playwright-fieldkit/scripts/save-auth.mjs <loginUrl> --headed --out ${opts.storageState}`);
     process.exit(2);
   }
 

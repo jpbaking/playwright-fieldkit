@@ -78,7 +78,7 @@ own command timeout — otherwise provide the clickable path and exact local
 command:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/node_modules/playwright/cli.js \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/node_modules/playwright/cli.js \
   show-trace <trace.zip> &
 ```
 

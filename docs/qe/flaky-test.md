@@ -12,7 +12,7 @@ Use `/pw-triage-flaky-test` with the smallest repository-native command that
 runs the suspect test. Retain a trace for every repeated permanent-test run:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/triage.mjs \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/triage.mjs \
   --runs 8 --artifacts test-results --out report/triage -- \
   pytest tests/e2e/test_checkout.py -k coupon --tracing=on
 ```

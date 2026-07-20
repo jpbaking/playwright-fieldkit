@@ -31,7 +31,7 @@ Classify the source before continuing:
   `report/test-case-run/design/flows/`:
 
   ```bash
-  node .agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
+  node ~/.agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
     <test-cases.json> --out report/test-case-run/design \
     --case <TC-ID> --flow-skeletons --require-approved
   ```
@@ -95,12 +95,12 @@ translated flow with `--trace` in both modes:
 
 ```bash
 # Headless
-node .agents/skills/pw-playwright-fieldkit/scripts/flow.mjs \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/flow.mjs \
   report/test-case-run/case-flow.json \
   --out report/test-case-run --trace
 
 # Headed: add --headed; the agent still performs every action
-node .agents/skills/pw-playwright-fieldkit/scripts/flow.mjs \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/flow.mjs \
   report/test-case-run/case-flow.json \
   --out report/test-case-run --trace --headed
 ```
@@ -131,7 +131,7 @@ get killed by the agent's own command timeout. Tell the user to close the
 viewer window when finished:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/node_modules/playwright/cli.js \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/node_modules/playwright/cli.js \
   show-trace report/test-case-run/trace.zip &
 ```
 

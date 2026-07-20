@@ -14,7 +14,7 @@ For each journey, document in its charter:
 - what can run concurrently without collisions.
 
 Adapt the matching scaffold from
-`.agents/skills/pw-playwright-fieldkit/templates/test-data-lifecycle.py` or
+`~/.agents/skills/pw-playwright-fieldkit/templates/test-data-lifecycle.py` or
 `test-data-lifecycle.ts`. Never invent real endpoints. Use the application's
 existing API layer and secret management. Validate cleanup by forcing a test to
 fail midway and confirming no durable data remains.

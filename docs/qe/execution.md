@@ -56,7 +56,7 @@ run with trace capture (the input is not named `flow.json` because the runner
 writes its results to `<out>/flow.json` and refuses to overwrite its input):
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/flow.mjs \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/flow.mjs \
   report/test-case-run/case-flow.json \
   --out report/test-case-run --trace
 ```
@@ -80,7 +80,7 @@ The trace must exist and be non-empty even when a step fails. The agent opens
 the viewer when graphical access is available or provides the path and command:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/node_modules/playwright/cli.js \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/node_modules/playwright/cli.js \
   show-trace report/test-case-run/trace.zip
 ```
 

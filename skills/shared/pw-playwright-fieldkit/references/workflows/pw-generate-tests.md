@@ -43,7 +43,7 @@ If you already crawled, use `report.md`: every **form** and every **primary user
 journey** is a test candidate. Otherwise crawl first:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 2 --max-pages 30 --out report/tests
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 2 --max-pages 30 --out report/tests
 ```
 
 Prioritize login, signup, search, the main create/edit/save flow, checkout, and
@@ -52,7 +52,7 @@ other core journeys.
 ## Step 3 — Write each journey as a flow
 
 Use one JSON file per journey. Follow
-`.agents/skills/pw-playwright-fieldkit/templates/flow.example.json` and prefer stable
+`~/.agents/skills/pw-playwright-fieldkit/templates/flow.example.json` and prefer stable
 locators such as `data-testid`, `name`, visible text, or roles. The crawl
 report's `selectorHint` fields provide candidates.
 
@@ -74,11 +74,11 @@ The output extension selects the generator; there is no language default:
 
 ```bash
 # Existing Python Playwright/pytest suite
-node .agents/skills/pw-playwright-fieldkit/scripts/flow.mjs login-flow.json --out report/tests \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/flow.mjs login-flow.json --out report/tests \
      --trace --gen-test tests/e2e/test_login.py
 
 # Existing @playwright/test suite
-node .agents/skills/pw-playwright-fieldkit/scripts/flow.mjs login-flow.json --out report/tests \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/flow.mjs login-flow.json --out report/tests \
      --trace --gen-test tests/login.spec.ts
 ```
 

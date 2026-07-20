@@ -9,7 +9,7 @@ Read the feature specification and the test-case source completely; do not
 review only the rendered summary. Run:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
   report/test-cases/test-cases-source.json --out report/test-cases
 ```
 
@@ -66,7 +66,7 @@ The agent may recommend approval but must not supply the user's decision.
   with:
 
   ```bash
-  node .agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
+  node ~/.agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
     report/test-cases/test-cases-source.json --out report/test-cases \
     --require-approved
   ```

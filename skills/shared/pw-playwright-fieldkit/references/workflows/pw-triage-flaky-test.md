@@ -5,7 +5,7 @@ artifact directory. Retain a trace for every repeated permanent-test run. Then
 repeat without hiding failures:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/triage.mjs \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/triage.mjs \
   --runs 8 --artifacts test-results --out report/triage -- \
   pytest tests/e2e/test_checkout.py -k coupon --tracing=on
 ```

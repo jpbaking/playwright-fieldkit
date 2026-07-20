@@ -43,11 +43,11 @@ Then run the recorder and keep the terminal process attached:
 
 ```bash
 # Python pytest example
-node .agents/skills/pw-playwright-fieldkit/scripts/record.mjs <URL> \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/record.mjs <URL> \
   --output report/recording/test_recorded.py
 
 # Existing authenticated @playwright/test example
-node .agents/skills/pw-playwright-fieldkit/scripts/record.mjs <URL> \
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/record.mjs <URL> \
   --output report/recording/recorded.spec.ts \
   --load-storage auth.json
 ```

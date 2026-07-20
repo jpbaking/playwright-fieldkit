@@ -15,20 +15,20 @@ Step 2C. The user does not need to type `/pw-debug-site`.
 
 ## Step 2A — If you must find the bug: crawl
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 2 --max-pages 40 --out report/debug
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs <START_URL> --depth 2 --max-pages 40 --out report/debug
 ```
 Read `report/debug/report.md` → **Problems found**. Each entry has the URL and
 the exact console error / failed request / bad status code. Those are your bugs.
 
 ## Step 2B — If you know the page: inspect it
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <URL> --wait 2000 --out report/debug
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <URL> --wait 2000 --out report/debug
 ```
 `inspect.md` gives you: HTTP status, every JS error with stack, failed/slow
 network requests, console warnings, the accessibility tree, and a screenshot.
 To capture the bug after an interaction, chain clicks:
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <URL> --click "text=Load more" --click "#save" --wait 2000
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <URL> --click "text=Load more" --click "#save" --wait 2000
 ```
 Each `--click` re-captures state, so you see errors triggered by the interaction.
 
@@ -39,7 +39,7 @@ still be a bug.
 
 1. Inspect the **source page**:
    ```
-   node .agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <SOURCE_URL> --wait 1000 --out report/debug-links
+   node ~/.agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <SOURCE_URL> --wait 1000 --out report/debug-links
    ```
 2. Read the initial state's **Link targets** in
    `report/debug-links/inspect.md`. Find the reported link by its visible text
@@ -49,7 +49,7 @@ still be a bug.
 4. Verify normal same-tab behavior by clicking the exact selector printed in the
    report:
    ```
-   node .agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <SOURCE_URL> --click '<SELECTOR>' --wait 1000 \
+   node ~/.agents/skills/pw-playwright-fieldkit/scripts/inspect.mjs <SOURCE_URL> --click '<SELECTOR>' --wait 1000 \
         --out report/debug-link-click
    ```
    Read the **URL** under “State: after click …”. Report both the declared target
@@ -85,7 +85,7 @@ Write a small `flow.json` that reproduces the bug step by step, then run it:
 ] }
 ```
 ```
-node .agents/skills/pw-playwright-fieldkit/scripts/flow.mjs flow.json --out report/debug
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/flow.mjs flow.json --out report/debug
 ```
 `flow.md` shows exactly which step failed, with a `FAILED-step-N.png` screenshot
 and any JS/network errors that fired during that step.

@@ -1,7 +1,7 @@
 # /pw-create-test-charter — preserve QE intent before automating
 
 Use after a recording or before test generation. Copy
-`.agents/skills/pw-playwright-fieldkit/templates/journey.example.json` to a working
+`~/.agents/skills/pw-playwright-fieldkit/templates/journey.example.json` to a working
 file and fill it from the user's language and repository evidence.
 
 Capture: intent, business risk, persona/role, preconditions, observable outcomes,
@@ -12,7 +12,7 @@ recording/flow/test. Ask only for missing facts that materially change the test.
 Validate and render it:
 
 ```bash
-node .agents/skills/pw-playwright-fieldkit/scripts/charter.mjs journey.json --out report/journey
+node ~/.agents/skills/pw-playwright-fieldkit/scripts/charter.mjs journey.json --out report/journey
 ```
 
 Do not automate a destructive charter without cleanup. Treat warnings as review
