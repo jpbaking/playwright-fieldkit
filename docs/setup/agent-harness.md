@@ -103,6 +103,7 @@ canonical file. For example:
 | `pw-record-flow` | `references/workflows/pw-record-flow.md` |
 | `pw-execute-test-case` | `references/workflows/pw-execute-test-case.md` |
 | `pw-run-automated-tests` | `references/workflows/pw-run-automated-tests.md` |
+| `pw-derive-tests-from-code` | `references/workflows/pw-derive-tests-from-code.md` |
 | `pw-create-test-charter` | `references/workflows/pw-create-test-charter.md` |
 | `pw-analyze-test-coverage` | `references/workflows/pw-analyze-test-coverage.md` |
 | `pw-generate-negative-tests` | `references/workflows/pw-generate-negative-tests.md` |

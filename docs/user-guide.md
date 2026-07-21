@@ -65,6 +65,7 @@ that cannot easily be undone usually deserve more attention.
 | An approved test-case document needs a witnessed journey | [Test Case Execution and Evidence](qe/execution.md) | `/pw-execute-test-case` |
 | Existing permanent test code needs to be run and reported | [Permanent Test Automation](qe/automation.md) | `/pw-run-automated-tests` |
 | A confirmed journey needs permanent automation | [Permanent Test Automation](qe/automation.md) | `/pw-record-flow`, `/pw-generate-tests`, `/pw-plan-test-data`, `/pw-generate-negative-tests`, `/pw-audit-journey` |
+| There is source code and a running app but no specification | [Permanent Test Automation](qe/automation.md) | `/pw-derive-tests-from-code` |
 | The team needs to find gaps or choose variants | [Coverage and Variants](qe/coverage.md) | `/pw-analyze-test-coverage`, `/pw-run-test-matrix` |
 | A test passes and fails inconsistently | [Flaky-Test Triage](qe/flaky-test.md) | `/pw-triage-flaky-test` |
 

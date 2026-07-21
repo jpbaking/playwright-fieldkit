@@ -11,6 +11,7 @@ JavaScript test directory.
 | What you have | What you want | Workflow |
 |---|---|---|
 | A demonstration | Capture and automate it | `/pw-record-flow` |
+| Application source code and a running instance, but no specification | Derive candidate journeys and reconcile them against a crawl | `/pw-derive-tests-from-code` |
 | A confirmed journey or `flow.json` | Create permanent test code | `/pw-generate-tests` |
 | Existing permanent Python/TypeScript/JavaScript tests | Run them unchanged and report traces | `/pw-run-automated-tests` |
 
@@ -37,6 +38,37 @@ outcomes.
 The recording is only a draft. It may contain accidental actions, sensitive
 values, fragile locators, or no meaningful assertions. The agent reviews it,
 adds outcomes, fits repository conventions, and then creates the permanent test.
+
+### Derive candidates from the application source
+
+Use `/pw-derive-tests-from-code` when there is no specification to design from
+and a crawl alone leaves the surface under-covered — parameterized routes,
+role-gated pages, and server-side validation are invisible to black-box
+exploration until a test trips them.
+
+It reads the routing and handler code for candidate journeys, then reconciles
+every candidate against a crawl of a matching revision, so code that cannot be
+reached never becomes a test. Its deliverable is confirmed intent, which it
+hands to `/pw-generate-tests`.
+
+Its expected results come from the implementation, so it labels each one:
+specified, derived, or contested. Because source code cannot tell intended
+behavior from a bug, the workflow first asks which goal the run serves:
+
+- **verify** — the tests must encode intended behavior. Structural expectations
+  (a route exists, an anonymous user is redirected, a required field is
+  rejected) may be asserted from code, but a business value — a total, a price,
+  a state transition — never is. The agent asks you for the intended value
+  without showing you the code's answer, asserts the observable shape instead,
+  or records it unasserted.
+- **lock** — the tests are a regression harness captured before a refactor, so
+  current behavior is the specification on purpose. Derived business values
+  *are* asserted, tagged with the revision they were captured from and flagged
+  as verifying nothing about correctness.
+
+Pick **lock** only when something is about to change underneath the app, and
+retire the suite when it does. Once a specification exists,
+`/pw-design-test-cases` is the better source of intent than any code reading.
 
 ### Generate from a confirmed journey
 

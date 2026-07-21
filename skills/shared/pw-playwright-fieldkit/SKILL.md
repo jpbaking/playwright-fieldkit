@@ -43,6 +43,9 @@ genuinely crosses intents.
   [pw-design-test-cases](references/workflows/pw-design-test-cases.md)
 - Review and explicitly approve specification-derived test cases:
   [pw-review-test-cases](references/workflows/pw-review-test-cases.md)
+- Derive candidate journeys by reading the application's routing/handler source,
+  reconciled against a crawl:
+  [pw-derive-tests-from-code](references/workflows/pw-derive-tests-from-code.md)
 - Turn a confirmed journey into a permanent traced test: [pw-generate-tests](references/workflows/pw-generate-tests.md)
 - Record a journey demonstrated interactively by the user: [pw-record-flow](references/workflows/pw-record-flow.md)
 - Execute an approved test-case document as a journey, capture a trace, and

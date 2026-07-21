@@ -45,6 +45,7 @@ thinking.
 | 🔗 **Checks links on demand** | `--check-links` verifies discovered internal/external links and assets with bounded, rate-limited requests, including redirect chains and source pages. |
 | 🔍 **Uncovers hidden features** | Flags beta flags, gated routes, admin tools, `robots` Disallow paths, and links the UI hides — logged out *and* logged in. |
 | 🎬 **Records your journey** | Opens a visible browser so you can demonstrate a flow, then lets the agent review, explain, and integrate the generated test. |
+| 🧠 **Derives tests from your source code** | Reads routing, handler, and validation code for candidate journeys — parameterized routes, role gates, server-side validation — reconciles each against a crawl, and labels every expected result as specified, derived, or contested. |
 | 📝 **Designs test cases from feature specs** | Extracts traceable requirements, drafts risk-based cases, and enforces separate QE review and approval before execution. |
 | 👀 **Executes approved test-case documents** | `/pw-execute-test-case` translates one approved case into a headed or headless journey, captures a trace, and asks you to confirm the execution. |
 | ▶️ **Runs permanent automated tests** | `/pw-run-automated-tests` runs existing Python or TypeScript/JavaScript test code unchanged and reports every result with mandatory traces. |
@@ -116,6 +117,7 @@ skill):
 - *"What features does this app have that aren't documented?"* → `/pw-discover-features`
 - *"Design test cases from this feature specification"* → `/pw-design-test-cases`
 - *"Review these cases against the specification"* → `/pw-review-test-cases`
+- *"Read the code and work out what integration tests this app needs"* → `/pw-derive-tests-from-code`
 - *"Write integration tests for the login and search flows"* → `/pw-generate-tests`
 - *"Let me demonstrate the checkout flow in a browser"* → `/pw-record-flow`
 - *"Execute this approved test case and let me review the trace"* → `/pw-execute-test-case`
