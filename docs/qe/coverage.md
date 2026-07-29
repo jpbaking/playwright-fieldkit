@@ -8,7 +8,7 @@ execute breadth; they do not create permanent tests by themselves.
 
 ## Find possible coverage gaps
 
-Use `/pw-analyze-test-coverage` after crawling the relevant environment as the
+Use `pw-analyze-test-coverage` after crawling the relevant environment as the
 same role represented by the existing suite. It compares discovered routes and
 forms with literal navigation evidence in Python or Node tests.
 
@@ -37,7 +37,7 @@ feature specification gap to the
 
 ## Select a risk-based variant matrix
 
-Use `/pw-run-test-matrix` for combinations justified by support commitments or
+Use `pw-run-test-matrix` for combinations justified by support commitments or
 known risk, for example:
 
 - customer and admin when permissions differ;
@@ -55,7 +55,7 @@ Before running variants:
 - prevent artifact and trace paths from colliding;
 - use the repository runner's native projects or parameters when available;
 - retain a trace for every permanent-test variant run, the same contract as
-  `/pw-run-automated-tests`;
+  `pw-run-automated-tests`;
 - distinguish unsupported combinations from product failures.
 
 ## Coverage review checklist

@@ -10,7 +10,7 @@ It does not create permanent automation before confirmation.
 
 ## Accepted inputs
 
-`/pw-execute-test-case` accepts:
+`pw-execute-test-case` accepts:
 
 - an approved FieldKit `test-cases.json` plus a selected case ID; or
 - an existing organizational test case or guide with preconditions, ordered

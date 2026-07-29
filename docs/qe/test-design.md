@@ -30,7 +30,7 @@ If the source already contains those details, use the
 
 ## Workflow 1: design cases from the specification
 
-Ask `/pw-design-test-cases` and provide the specification path or pasted text.
+Ask `pw-design-test-cases` and provide the specification path or pasted text.
 The agent reads it as the source of truth and separates:
 
 - documented requirements;
@@ -88,7 +88,7 @@ Draft cases remain `draft`; design does not approve its own output.
 
 ## Workflow 2: review and approve the cases
 
-Ask `/pw-review-test-cases`. The agent reads both the original feature
+Ask `pw-review-test-cases`. The agent reads both the original feature
 specification and the test cases. It reviews:
 
 - requirement traceability and meaningful coverage;
@@ -122,7 +122,7 @@ node ~/.agents/skills/pw-playwright-fieldkit/scripts/test-cases.mjs \
 
 ## Optional: create a journey charter
 
-Use `/pw-create-test-charter` when one high-risk user journey needs additional
+Use `pw-create-test-charter` when one high-risk user journey needs additional
 intent, business risk, data lifecycle, variants, and automation links kept
 together. A charter complements the requirement traceability matrix; it does not
 replace test-case approval.

@@ -8,7 +8,7 @@ must be investigated with evidence.
 
 ## Reproduce the narrowest case
 
-Use `/pw-triage-flaky-test` with the smallest repository-native command that
+Use `pw-triage-flaky-test` with the smallest repository-native command that
 runs the suspect test. Retain a trace for every repeated permanent-test run:
 
 ```bash

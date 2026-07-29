@@ -1,0 +1,4 @@
+interface:
+  display_name: "PW Playwright FieldKit"
+  short_description: "Explore, design, and automate web quality"
+  default_prompt: "Use $pw-playwright-fieldkit to explore this website and produce verified findings or tests."

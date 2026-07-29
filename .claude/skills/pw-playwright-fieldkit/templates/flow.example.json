@@ -1,0 +1,17 @@
+{
+  "name": "search returns results",
+  "baseUrl": "https://example.com",
+  "storageState": null,
+  "_comment": "Each step is ONE object with one supported action key plus that action's options; option order does not matter. Use --gen-test tests/test_search.py for Python or --gen-test tests/search.spec.ts for @playwright/test. See negative-flow.example.json for network failure and state accessibility steps.",
+  "_supportedActions": "mockResponse mockAbort goto click fill type select check uncheck press hover scrollTo waitFor waitForUrl wait expectText expectUrl expectVisible expectNotVisible expectValue expectCount auditA11y screenshot",
+  "steps": [
+    { "goto": "/" },
+    { "expectVisible": "input[type=search]" },
+    { "fill": "input[type=search]", "value": "playwright" },
+    { "expectValue": "input[type=search]", "value": "playwright" },
+    { "press": "Enter", "selector": "input[type=search]" },
+    { "waitForUrl": "search" },
+    { "expectText": "results" },
+    { "screenshot": "search-results" }
+  ]
+}

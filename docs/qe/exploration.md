@@ -12,11 +12,11 @@ not prove complete coverage.
 
 | Question | Workflow | What the agent produces |
 |---|---|---|
-| What pages, forms, errors, and hidden surfaces exist? | `/pw-explore-site` | A bounded crawl report and machine-readable evidence |
-| Why does this specific page or action fail? | `/pw-debug-site` | Focused page inspection, browser/runtime evidence, and a diagnosis |
-| What functionality is present but poorly documented or hard to find? | `/pw-discover-features` | Evidence-backed feature inventory and follow-up candidates |
-| What changed between two comparable observations? | `/pw-compare-runs` | A crawl comparison with additions, removals, and regressions |
-| Which observed improvements should the team consider first? | `/pw-recommend-improvements` | Prioritized recommendations tied to captured evidence |
+| What pages, forms, errors, and hidden surfaces exist? | `pw-explore-site` | A bounded crawl report and machine-readable evidence |
+| Why does this specific page or action fail? | `pw-debug-site` | Focused page inspection, browser/runtime evidence, and a diagnosis |
+| What functionality is present but poorly documented or hard to find? | `pw-discover-features` | Evidence-backed feature inventory and follow-up candidates |
+| What changed between two comparable observations? | `pw-compare-runs` | A crawl comparison with additions, removals, and regressions |
+| Which observed improvements should the team consider first? | `pw-recommend-improvements` | Prioritized recommendations tied to captured evidence |
 
 Natural-language requests work too. Include the authorized URL, environment,
 role, and the question you need answered. State any path, page-count, or time
@@ -55,7 +55,7 @@ authoritative source before filing an issue.
 - If a finding points to undocumented requirements, obtain or update the
   feature specification and continue with [Test Design](test-design.md).
 - If the intended journey is now understood and witnessed, capture it with
-  `/pw-record-flow`, then continue with [Permanent Test Automation](automation.md).
+  `pw-record-flow`, then continue with [Permanent Test Automation](automation.md).
 - If an existing suite may already cover the surface, use
   [Coverage and Variants](coverage.md) before adding duplicate tests.
 - If behavior is inconsistent across repeated runs, use

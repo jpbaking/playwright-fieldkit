@@ -1,0 +1,20 @@
+{
+  "variants": [
+    {
+      "name": "customer-chromium",
+      "role": "customer",
+      "browser": "chromium",
+      "device": "desktop",
+      "command": ["pytest", "tests/e2e/test_coupon.py", "--browser", "chromium"],
+      "env": { "TEST_ROLE": "customer" }
+    },
+    {
+      "name": "admin-firefox",
+      "role": "admin",
+      "browser": "firefox",
+      "device": "desktop",
+      "command": ["pytest", "tests/e2e/test_coupon.py", "--browser", "firefox"],
+      "env": { "TEST_ROLE": "admin" }
+    }
+  ]
+}

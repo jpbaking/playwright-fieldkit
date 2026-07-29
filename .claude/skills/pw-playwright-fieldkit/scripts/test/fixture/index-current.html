@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FieldKit fixture</title>
+    <script>console.error("current fixture regression")</script>
+  </head>
+  <body>
+    <header><h1>Playwright FieldKit fixture</h1></header>
+    <main>
+      <nav aria-label="Fixture pages">
+        <a href="/about.html">About</a>
+        <a href="/added.html">Added in current</a>
+        <a href="/private.html">Robots-excluded page</a>
+        <a href="/flow.html">Flow fixture</a>
+        <a href="/inspect.html">Inspection fixture</a>
+        <img src="/missing-audit-asset.png" alt="Missing asset fixture">
+        <a href="/head-fallback">HEAD fallback fixture</a>
+        <a href="https://example.invalid/outside">Scope-skipped external fixture</a>
+      </nav>
+      <p>This is the current version.</p>
+      <form action="/subscribe" method="post">
+        <label>Email <input name="email" type="email"></label>
+        <button type="submit">Subscribe</button>
+      </form>
+    </main>
+  </body>
+</html>

@@ -24,13 +24,14 @@ Fetch https://raw.githubusercontent.com/jpbaking/playwright-fieldkit/main/AGENT-
 
 The agent acquires the sources itself (`git clone`, repo zip, or `gh`) and
 installs the canonical package to `~/.agents/skills/pw-playwright-fieldkit/`
-(Codex discovery and the single runtime home of the scripts) with
+(Codex and Pi discovery plus the single runtime home of the scripts) with
 byte-identical copies in `~/.claude/skills/` (Claude Code),
-`~/.gemini/config/skills/` (Antigravity), and `~/.cline/skills/` (Cline),
-plus the activation rule in each harness's global rules location and global
-Cline `/pw-*` workflow shortcuts. The install is per-user and per-machine
+`~/.gemini/antigravity-cli/skills/` (Antigravity CLI), and
+`~/.cline/skills/` (Cline). The activation rule is stored once under
+`~/.agents/rules/` and referenced from each selected host's global instruction
+file. The install is per-user and per-machine
 (the `scripts/node_modules` browser runtime is per-machine anyway); re-run
-it anytime to update. Keep any unrelated rules or workflows already present.
+it anytime to update. Keep unrelated rules and instructions already present.
 
 Then:
 

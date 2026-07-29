@@ -1,0 +1,15 @@
+{
+  "name": "checkout recovers when pricing is unavailable",
+  "baseUrl": "https://staging.example.com",
+  "steps": [
+    {
+      "mockResponse": "**/api/pricing",
+      "status": 503,
+      "body": { "error": "temporarily unavailable" }
+    },
+    { "goto": "/checkout" },
+    { "expectText": "Pricing is temporarily unavailable" },
+    { "expectVisible": "[data-testid=retry-pricing]" },
+    { "auditA11y": "pricing error state" }
+  ]
+}

@@ -18,8 +18,8 @@ matching workflow while you provide product judgment and review its evidence.
 4. Let the agent follow the workflow, then review the requested decisions and
    evidence. Browser workflows never require you to assemble CLI commands.
 
-Cline has first-class workflow shortcuts. Other terminal-capable coding agents
-can use the same package through the [Agent Harness Guide](setup/agent-harness.md).
+Antigravity CLI, Codex, Claude Code, Cline, and Pi use the same portable
+package through the [Agent Harness Guide](setup/agent-harness.md).
 The [CLI Reference](reference/cli.md) is supporting detail for agents and
 maintainers who need command flags, JSON formats, or output contracts; it is not
 a separate product workflow.
@@ -60,17 +60,17 @@ that cannot easily be undone usually deserve more attention.
 
 | Your starting point or problem | Focused guide | Main workflows |
 |---|---|---|
-| A running site needs to be mapped, inspected, debugged, compared, or assessed | [Site Exploration and Diagnosis](qe/exploration.md) | `/pw-explore-site`, `/pw-debug-site`, `/pw-discover-features`, `/pw-compare-runs`, `/pw-recommend-improvements` |
-| A feature specification needs test cases | [Feature Specification to Test Cases](qe/test-design.md) | `/pw-design-test-cases`, `/pw-review-test-cases`, `/pw-create-test-charter` |
-| An approved test-case document needs a witnessed journey | [Test Case Execution and Evidence](qe/execution.md) | `/pw-execute-test-case` |
-| Existing permanent test code needs to be run and reported | [Permanent Test Automation](qe/automation.md) | `/pw-run-automated-tests` |
-| A confirmed journey needs permanent automation | [Permanent Test Automation](qe/automation.md) | `/pw-record-flow`, `/pw-generate-tests`, `/pw-plan-test-data`, `/pw-generate-negative-tests`, `/pw-audit-journey` |
-| There is source code and a running app but no specification | [Permanent Test Automation](qe/automation.md) | `/pw-derive-tests-from-code` |
-| The team needs to find gaps or choose variants | [Coverage and Variants](qe/coverage.md) | `/pw-analyze-test-coverage`, `/pw-run-test-matrix` |
-| A test passes and fails inconsistently | [Flaky-Test Triage](qe/flaky-test.md) | `/pw-triage-flaky-test` |
+| A running site needs to be mapped, inspected, debugged, compared, or assessed | [Site Exploration and Diagnosis](qe/exploration.md) | `pw-explore-site`, `pw-debug-site`, `pw-discover-features`, `pw-compare-runs`, `pw-recommend-improvements` |
+| A feature specification needs test cases | [Feature Specification to Test Cases](qe/test-design.md) | `pw-design-test-cases`, `pw-review-test-cases`, `pw-create-test-charter` |
+| An approved test-case document needs a witnessed journey | [Test Case Execution and Evidence](qe/execution.md) | `pw-execute-test-case` |
+| Existing permanent test code needs to be run and reported | [Permanent Test Automation](qe/automation.md) | `pw-run-automated-tests` |
+| A confirmed journey needs permanent automation | [Permanent Test Automation](qe/automation.md) | `pw-record-flow`, `pw-generate-tests`, `pw-plan-test-data`, `pw-generate-negative-tests`, `pw-audit-journey` |
+| There is source code and a running app but no specification | [Permanent Test Automation](qe/automation.md) | `pw-derive-tests-from-code` |
+| The team needs to find gaps or choose variants | [Coverage and Variants](qe/coverage.md) | `pw-analyze-test-coverage`, `pw-run-test-matrix` |
+| A test passes and fails inconsistently | [Flaky-Test Triage](qe/flaky-test.md) | `pw-triage-flaky-test` |
 
-Natural-language requests work too. Slash commands make the intended workflow
-boundary explicit.
+Natural-language requests are the portable interface. The identifiers above
+name the bundled workflows selected by the one `pw-playwright-fieldkit` skill.
 
 ## Understand the main artifacts
 
@@ -147,8 +147,8 @@ the relevant permanent-run trace when reporting a defect to developers.
   configure CI, or use Docker.
 - [Troubleshooting](setup/troubleshooting.md) — diagnose setup, browser,
   execution, report, and generated-test problems.
-- [Agent Harness Guide](setup/agent-harness.md) — connect FieldKit to coding
-  agents other than Cline.
+- [Agent Harness Guide](setup/agent-harness.md) — understand portable
+  discovery, generated adapters, and smoke tests.
 - [CLI Reference](reference/cli.md) — use the tools directly or look up every
   command, option, output, and flow action.
 - [Future Work](reference/future-work.md) — review unimplemented ideas; these

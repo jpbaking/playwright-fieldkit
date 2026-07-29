@@ -4,16 +4,15 @@
 
 Give your AI coding assistant a reliable pair of hands and eyes on the web.
 
-Playwright FieldKit is a drop-in toolkit that teaches Cline (and other coding
-agents) to *walk through a website like a real user* — clicking,
+Playwright FieldKit is a drop-in toolkit that teaches coding agents to *walk
+through a website like a real user*—clicking,
 reading, filling forms, following links — and come back with a report you can
 act on. Point it at a URL and it will map the reachable, same-origin surface, catch what's broken,
 uncover hidden features, and write integration tests that actually pass.
 
-Cline gets first-class skill activation and shortcut packaging, but the core is
-ordinary Node.js plus Markdown playbooks. Other terminal-capable agent harnesses
-can use the same canonical package through a thin adapter; start with the
-[User Guide](docs/user-guide.md) for the supported setup paths and workflows.
+The core is ordinary Node.js plus Markdown playbooks, packaged as one portable
+Agent Skill for Antigravity CLI, Codex, Claude Code, Cline, and Pi. Start with
+the [User Guide](docs/user-guide.md) for setup paths and workflows.
 
 Run unattended or watch the agent execute a supplied test case in a headed
 browser. No brittle hand-written automation or model web access is required—just
@@ -47,9 +46,9 @@ thinking.
 | 🎬 **Records your journey** | Opens a visible browser so you can demonstrate a flow, then lets the agent review, explain, and integrate the generated test. |
 | 🧠 **Derives tests from your source code** | Reads routing, handler, and validation code for candidate journeys — parameterized routes, role gates, server-side validation — reconciles each against a crawl, and labels every expected result as specified, derived, or contested. |
 | 📝 **Designs test cases from feature specs** | Extracts traceable requirements, drafts risk-based cases, and enforces separate QE review and approval before execution. |
-| 👀 **Executes approved test-case documents** | `/pw-execute-test-case` translates one approved case into a headed or headless journey, captures a trace, and asks you to confirm the execution. |
-| ▶️ **Runs permanent automated tests** | `/pw-run-automated-tests` runs existing Python or TypeScript/JavaScript test code unchanged and reports every result with mandatory traces. |
-| ✅ **Writes real tests** | `/pw-generate-tests` turns confirmed journeys into permanent test code, then hands it to the automated-test runner for traced verification. |
+| 👀 **Executes approved test-case documents** | `pw-execute-test-case` translates one approved case into a headed or headless journey, captures a trace, and asks you to confirm the execution. |
+| ▶️ **Runs permanent automated tests** | `pw-run-automated-tests` runs existing Python or TypeScript/JavaScript test code unchanged and reports every result with mandatory traces. |
+| ✅ **Writes real tests** | `pw-generate-tests` turns confirmed journeys into permanent test code, then hands it to the automated-test runner for traced verification. |
 | 🧭 **Preserves QE intent** | Turns journey intent, risk, data, outcomes, variants, and cleanup into a validated charter before replay code becomes the specification. |
 | 🧩 **Finds automation gaps** | Compares crawled routes and forms with literal navigation found in existing Python or Node tests for review and prioritization. |
 | 🧪 **Exercises failure states** | Adds deterministic response/network mocks and accessibility checks at meaningful interactive states, then emits them into generated tests. |
@@ -81,7 +80,7 @@ _No console errors, failed requests, or bad status codes observed._
 ```
 
 From there the model can say: *"Found a login form at `/login`. Want me to turn
-it into a test?"* — and `/pw-generate-tests` writes a passing test in the
+it into a test?"* — and `pw-generate-tests` writes a passing test in the
 project's existing language.
 
 ---
@@ -94,7 +93,17 @@ Installation is agent-guided only — there are no install scripts. Paste this i
 Fetch https://raw.githubusercontent.com/jpbaking/playwright-fieldkit/main/AGENT-INSTALL.md and follow its instructions exactly to install Playwright FieldKit. Merge with — never blindly overwrite — any existing global instruction files, and report every file you created or changed.
 ```
 
-The install is **user-global** — nothing is added to your repos. The agent acquires the sources itself (`git clone`, repo zip, or `gh`) and installs the canonical package from [`skills/shared/pw-playwright-fieldkit/`](skills/shared/pw-playwright-fieldkit/) to `~/.agents/skills/pw-playwright-fieldkit/` (Codex discovery and the single runtime home of the scripts), with byte-identical copies in `~/.claude/skills/` (Claude Code), `~/.gemini/config/skills/` (Antigravity), and `~/.cline/skills/` (Cline); Cursor discovers the `~/.agents/skills/` copy natively. It also installs the always-on activation rule per harness's global rules location and generates global Cline `/pw-*` workflow shortcuts. Then, from any project root:
+The install is **user-global**—nothing is added to your repos. The agent
+acquires the sources itself (`git clone`, repo zip, or `gh`) and installs the
+authoritative package from
+[`.agents/skills/pw-playwright-fieldkit/`](.agents/skills/pw-playwright-fieldkit/)
+to `~/.agents/skills/pw-playwright-fieldkit/` (Codex and Pi discovery plus the
+single scripts runtime), with source-identical copies in
+`~/.claude/skills/` (Claude Code),
+`~/.gemini/antigravity-cli/skills/` (Antigravity CLI), and
+`~/.cline/skills/` (Cline). It stores the activation rule once under
+`~/.agents/rules/` and points each selected host's global instruction file to
+it. Then, from any project root:
 
 ```bash
 # 1. Install the browser engine (once)
@@ -103,38 +112,32 @@ The install is **user-global** — nothing is added to your repos. The agent acq
 # 2. Map a site
 node ~/.agents/skills/pw-playwright-fieldkit/scripts/crawl.mjs https://your-app.example.com --depth 2 --max-pages 40
 
-# 3. Read playwright-report-explore/report.md — or just ask Cline to "/pw-explore-site"
+# 3. Read playwright-report-explore/report.md—or ask the agent to explore the site
 ```
 
-The installed package lives in `~/.agents/skills/pw-playwright-fieldkit/`. A small
-always-on rule helps weaker models activate it from natural-language requests,
-and the familiar workflows remain available as explicit shortcuts (shown as
-Cline/Claude slash commands below; Codex reaches the same playbooks through the
-skill):
+The installed package lives in `~/.agents/skills/pw-playwright-fieldkit/`. A
+small always-on rule helps weaker models activate it from natural-language
+requests, and the skill routes each request to the matching bundled workflow:
 
-- *"Explore my site at localhost:3000 and tell me what's broken"* → `/pw-explore-site`
-- *"The save button throws an error, debug it"* → `/pw-debug-site`
-- *"What features does this app have that aren't documented?"* → `/pw-discover-features`
-- *"Design test cases from this feature specification"* → `/pw-design-test-cases`
-- *"Review these cases against the specification"* → `/pw-review-test-cases`
-- *"Read the code and work out what integration tests this app needs"* → `/pw-derive-tests-from-code`
-- *"Write integration tests for the login and search flows"* → `/pw-generate-tests`
-- *"Let me demonstrate the checkout flow in a browser"* → `/pw-record-flow`
-- *"Execute this approved test case and let me review the trace"* → `/pw-execute-test-case`
-- *"Run these generated Playwright tests and report every trace"* → `/pw-run-automated-tests`
-- *"Audit the site and tell me what to improve"* → `/pw-recommend-improvements`
-- *"Did my last deploy change or break anything?"* → `/pw-compare-runs`
+- *"Explore my site at localhost:3000 and tell me what's broken"* → `pw-explore-site`
+- *"The save button throws an error, debug it"* → `pw-debug-site`
+- *"What features does this app have that aren't documented?"* → `pw-discover-features`
+- *"Design test cases from this feature specification"* → `pw-design-test-cases`
+- *"Review these cases against the specification"* → `pw-review-test-cases`
+- *"Read the code and work out what integration tests this app needs"* → `pw-derive-tests-from-code`
+- *"Write integration tests for the login and search flows"* → `pw-generate-tests`
+- *"Let me demonstrate the checkout flow in a browser"* → `pw-record-flow`
+- *"Execute this approved test case and let me review the trace"* → `pw-execute-test-case`
+- *"Run these generated Playwright tests and report every trace"* → `pw-run-automated-tests`
+- *"Audit the site and tell me what to improve"* → `pw-recommend-improvements`
+- *"Did my last deploy change or break anything?"* → `pw-compare-runs`
 
-Quality engineers can also use explicit shortcuts for charters, coverage gaps,
-test data, negative paths, interactive accessibility, risk-based matrices, and
-flake triage. The [User Guide](docs/user-guide.md) routes beginners to a focused
-guide for each workflow set.
-
-Using another coding-agent harness? Keep the canonical skill at
-`~/.agents/skills/pw-playwright-fieldkit/` and point that harness's repository rule or
-native skill adapter at its `SKILL.md`. The
-[Agent Harness Guide](docs/setup/agent-harness.md) has the portable adapter
-prompt, shortcut mapping, capability requirements, and smoke test.
+Quality engineers can request charters, coverage gaps, test data, negative
+paths, interactive accessibility, risk-based matrices, and flake triage in
+plain language. The [User Guide](docs/user-guide.md) routes beginners to a
+focused guide for each workflow set. The
+[Agent Harness Guide](docs/setup/agent-harness.md) documents capability
+requirements and smoke tests.
 
 ---
 
@@ -142,7 +145,7 @@ prompt, shortcut mapping, capability requirements, and smoke test.
 
 ```
 pw-playwright-fieldkit/
-├── ~/.agents/skills/pw-playwright-fieldkit/
+├── .agents/skills/pw-playwright-fieldkit/   # authoritative
 │   ├── SKILL.md             # Intent routing, operating guidance, safety
 │   ├── scripts/             # Deterministic browser engine + regression suite
 │   │   ├── crawl.mjs
@@ -158,6 +161,8 @@ pw-playwright-fieldkit/
 │   │   └── triage.mjs
 │   ├── templates/           # Flow, charter, matrix, data, spec, and page-object scaffolds
 │   └── references/workflows/ # Detailed workflow playbooks
+├── .claude/skills/pw-playwright-fieldkit/  # generated byte-identical mirror
+├── .clinerules/workflows/                  # generated thin skill shim
 ├── rules/shared/            # Always-on activation rule (installed per harness)
 ├── AGENT-INSTALL.md         # The agent-guided (user-global) install contract
 └── docs/
@@ -174,8 +179,8 @@ pw-playwright-fieldkit/
 - **Node.js 18+**
 - **Playwright** (`npm install && npx playwright install chromium` in
   `~/.agents/skills/pw-playwright-fieldkit/scripts/`)
-- A coding agent that can run shell commands and read files (Cline, or any
-  similar agent). **No web-search/fetch capability is needed.**
+- A coding agent that can run shell commands and read files. **No
+  web-search/fetch capability is needed.**
 
 Run the bundled localhost regression suite with `cd ~/.agents/skills/pw-playwright-fieldkit/scripts && npm test`.
 

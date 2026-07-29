@@ -283,7 +283,7 @@ node ~/.agents/skills/pw-playwright-fieldkit/scripts/flow.mjs <flow.json> [optio
 | `--wait <ms>` | `500` | Settle time after each step. |
 
 The CLI does not guess the repository's language: the output filename makes the
-choice explicit. The `/pw-generate-tests` workflow first inspects existing test
+choice explicit. The `pw-generate-tests` workflow first inspects existing test
 code and dependencies, and asks when the convention is missing or ambiguous.
 Python output currently targets pytest with Playwright's synchronous `page`
 fixture. The exit code is `0` if the flow passed and `1` if any step failed.
@@ -391,7 +391,7 @@ destructive journey must also declare cleanup.
 node ~/.agents/skills/pw-playwright-fieldkit/scripts/charter.mjs journey.json --out report/journey
 ```
 
-Start from [`journey.example.json`](../../skills/shared/pw-playwright-fieldkit/templates/journey.example.json).
+Start from [`journey.example.json`](../../.agents/skills/pw-playwright-fieldkit/templates/journey.example.json).
 Warnings call out weak preconditions or data isolation without preventing an
 otherwise valid charter from being saved.
 
@@ -422,7 +422,7 @@ approvals that omit a reviewer or retain open questions.
 On validation errors the command still writes `test-cases.md`/`test-cases.json`
 with a **Validation errors** section for context, then exits `1`.
 Start from
-[`test-cases.example.json`](../../skills/shared/pw-playwright-fieldkit/templates/test-cases.example.json).
+[`test-cases.example.json`](../../.agents/skills/pw-playwright-fieldkit/templates/test-cases.example.json).
 
 ### coverage.mjs — find route and form gaps
 
@@ -457,7 +457,7 @@ node ~/.agents/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --dr
 node ~/.agents/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --out report/matrix
 ```
 
-Start from [`matrix.example.json`](../../skills/shared/pw-playwright-fieldkit/templates/matrix.example.json).
+Start from [`matrix.example.json`](../../.agents/skills/pw-playwright-fieldkit/templates/matrix.example.json).
 Prefer the consuming test runner's native projects or parameters when they
 already provide the required matrix.
 
@@ -483,7 +483,7 @@ a failing exit when any run fails, making accidental CI success unlikely.
 A flow is a JSON object with a `steps` array. Each step is **one object with
 exactly one supported action key** plus any options that action needs, such as
 `value`, `selector`, `status`, or `body`. Option order does not matter. Start from
-[`~/.agents/skills/pw-playwright-fieldkit/templates/flow.example.json`](../../skills/shared/pw-playwright-fieldkit/templates/flow.example.json).
+[`~/.agents/skills/pw-playwright-fieldkit/templates/flow.example.json`](../../.agents/skills/pw-playwright-fieldkit/templates/flow.example.json).
 
 ```json
 {
@@ -536,7 +536,7 @@ The `expect*` actions are what make a flow a *test*: if the condition isn't met,
 the flow fails at that step and tells you why. Generating a test with
 `--gen-test` converts these into the selected language's Playwright assertions.
 Mock routes and state audits are also emitted into generated tests. See
-[`negative-flow.example.json`](../../skills/shared/pw-playwright-fieldkit/templates/negative-flow.example.json)
+[`negative-flow.example.json`](../../.agents/skills/pw-playwright-fieldkit/templates/negative-flow.example.json)
 for a failure-path example. `auditA11y` is a focused smoke audit, not proof of
 WCAG conformance. Its finding codes are `missing-lang`, `missing-main`,
 `h1-count`, `unlabeled-control`, `unnamed-button`, `unnamed-link`, and
@@ -632,8 +632,9 @@ not retained. Reach for JSON when the Markdown omits a detail you need.
 
 ## Working with Cline
 
-The canonical Cline package is the project skill at
-`~/.agents/skills/pw-playwright-fieldkit/`:
+The installed runtime package is
+`~/.agents/skills/pw-playwright-fieldkit/`; Cline discovers a byte-identical
+copy under `~/.cline/skills/`:
 
 - **`SKILL.md`** describes when to activate the toolkit, routes requests to the
   right playbook, and carries the safety constraints.
@@ -641,14 +642,11 @@ The canonical Cline package is the project skill at
 - **`scripts/` and `templates/`** travel with the skill instead of cluttering the
   consuming project's root.
 
-The install adds user-global compatibility adapters: a short always-on
-activation rule in each harness's global rules location for models that miss
-skills, and generated `/pw-*` shortcut workflow stubs in Cline's global
-Workflows directory. They include exploration,
-debugging, recording, document-driven test-case execution, generation and
-comparison, plus charter, coverage, data, negative path, accessibility-state,
-matrix, and flake-triage workflows. Each shortcut delegates to the canonical
-skill workflow, so detailed instructions have a single source of truth. The
+The install adds one marker-guarded activation pointer to Cline's global
+`~/.agents/AGENTS.md`. The skill routes exploration, debugging, recording,
+document-driven test-case execution, generation, comparison, charters,
+coverage, data, negative paths, accessibility states, matrices, and flake
+triage to the canonical reference files. The
 [User Guide](../user-guide.md) routes readers to a focused guide for each
 workflow set.
 
