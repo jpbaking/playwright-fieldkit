@@ -21,16 +21,17 @@ with existing global instruction files instead of colliding with them:
 ```
 Install Playwright FieldKit. Using git with my existing credentials (do not
 download raw files or archives), clone
-https://github.com/jpbaking/playwright-fieldkit with --depth 1 into a new
-temporary directory outside any project. Then read AGENT-INSTALL.md from that
-clone and follow it exactly. Merge with—never blindly overwrite—any existing
-global instruction files, ask me which harnesses to install for, and report
-every file you created or changed.
+https://github.com/jpbaking/playwright-fieldkit at tag v4.0.0 with --depth 1
+into a new temporary directory outside any project. Then read AGENT-INSTALL.md
+from that clone and follow it exactly. Merge with—never blindly overwrite—any
+existing global instruction files, ask me which harnesses to install for, and
+report every file you created or changed.
 ```
 
-Without a tag, the prompt installs the default branch as it is at clone time;
-add `at tag vX.Y.Z` (cloned with `--branch vX.Y.Z`) to pin a release. On a
-fork, mirror, or enterprise host, substitute the remote you clone from.
+This prompt pins release `v4.0.0` (cloned with `--branch v4.0.0`). To install
+another release, change the tag; to track the default branch, drop
+`at tag v4.0.0`. On a fork, mirror, or enterprise host, substitute the remote
+you clone from.
 
 **What the prompt does:** your agent clones this repository with your own git
 credentials and executes [AGENT-INSTALL.md](../../AGENT-INSTALL.md), the authoritative
