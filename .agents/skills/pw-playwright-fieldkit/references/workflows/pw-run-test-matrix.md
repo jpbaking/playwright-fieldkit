@@ -5,7 +5,7 @@ test across every combination. Select variants that exercise a real role,
 engine, viewport/device, locale, or timezone risk; keep a fast primary variant
 for ordinary feedback.
 
-Copy `~/.agents/skills/pw-playwright-fieldkit/templates/matrix.example.json`, then
+Copy `~/.agents/skills/pw-playwright-fieldkit/assets/matrix.example.json`, then
 replace each command with the repository's normal runner invocation. Commands
 are arrays and are executed without shell interpolation. Ensure parallel variants
 have isolated accounts/data and non-colliding artifact paths.

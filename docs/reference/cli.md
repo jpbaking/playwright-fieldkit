@@ -391,7 +391,7 @@ destructive journey must also declare cleanup.
 node ~/.agents/skills/pw-playwright-fieldkit/scripts/charter.mjs journey.json --out report/journey
 ```
 
-Start from [`journey.example.json`](../../.agents/skills/pw-playwright-fieldkit/templates/journey.example.json).
+Start from [`journey.example.json`](../../.agents/skills/pw-playwright-fieldkit/assets/journey.example.json).
 Warnings call out weak preconditions or data isolation without preventing an
 otherwise valid charter from being saved.
 
@@ -422,7 +422,7 @@ approvals that omit a reviewer or retain open questions.
 On validation errors the command still writes `test-cases.md`/`test-cases.json`
 with a **Validation errors** section for context, then exits `1`.
 Start from
-[`test-cases.example.json`](../../.agents/skills/pw-playwright-fieldkit/templates/test-cases.example.json).
+[`test-cases.example.json`](../../.agents/skills/pw-playwright-fieldkit/assets/test-cases.example.json).
 
 ### coverage.mjs — find route and form gaps
 
@@ -457,7 +457,7 @@ node ~/.agents/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --dr
 node ~/.agents/skills/pw-playwright-fieldkit/scripts/matrix.mjs matrix.json --out report/matrix
 ```
 
-Start from [`matrix.example.json`](../../.agents/skills/pw-playwright-fieldkit/templates/matrix.example.json).
+Start from [`matrix.example.json`](../../.agents/skills/pw-playwright-fieldkit/assets/matrix.example.json).
 Prefer the consuming test runner's native projects or parameters when they
 already provide the required matrix.
 
@@ -483,7 +483,7 @@ a failing exit when any run fails, making accidental CI success unlikely.
 A flow is a JSON object with a `steps` array. Each step is **one object with
 exactly one supported action key** plus any options that action needs, such as
 `value`, `selector`, `status`, or `body`. Option order does not matter. Start from
-[`~/.agents/skills/pw-playwright-fieldkit/templates/flow.example.json`](../../.agents/skills/pw-playwright-fieldkit/templates/flow.example.json).
+[`~/.agents/skills/pw-playwright-fieldkit/assets/flow.example.json`](../../.agents/skills/pw-playwright-fieldkit/assets/flow.example.json).
 
 ```json
 {
@@ -536,7 +536,7 @@ The `expect*` actions are what make a flow a *test*: if the condition isn't met,
 the flow fails at that step and tells you why. Generating a test with
 `--gen-test` converts these into the selected language's Playwright assertions.
 Mock routes and state audits are also emitted into generated tests. See
-[`negative-flow.example.json`](../../.agents/skills/pw-playwright-fieldkit/templates/negative-flow.example.json)
+[`negative-flow.example.json`](../../.agents/skills/pw-playwright-fieldkit/assets/negative-flow.example.json)
 for a failure-path example. `auditA11y` is a focused smoke audit, not proof of
 WCAG conformance. Its finding codes are `missing-lang`, `missing-main`,
 `h1-count`, `unlabeled-control`, `unnamed-button`, `unnamed-link`, and
@@ -633,13 +633,12 @@ not retained. Reach for JSON when the Markdown omits a detail you need.
 ## Working with Cline
 
 The installed runtime package is
-`~/.agents/skills/pw-playwright-fieldkit/`; Cline discovers a byte-identical
-copy under `~/.cline/skills/`:
+`~/.agents/skills/pw-playwright-fieldkit/`, which Cline discovers directly:
 
 - **`SKILL.md`** describes when to activate the toolkit, routes requests to the
   right playbook, and carries the safety constraints.
 - **`references/workflows/*.md`** contain the detailed procedures.
-- **`scripts/` and `templates/`** travel with the skill instead of cluttering the
+- **`scripts/` and `assets/`** travel with the skill instead of cluttering the
   consuming project's root.
 
 The install adds one marker-guarded activation pointer to Cline's global

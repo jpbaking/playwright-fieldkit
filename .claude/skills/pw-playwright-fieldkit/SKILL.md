@@ -106,5 +106,5 @@ Keep generated reports in the workspace, not inside the skill package.
 
 - Human documentation remains in workspace `docs/`.
 - Test scaffolds and flow examples are in
-  `~/.agents/skills/pw-playwright-fieldkit/templates/`.
+  `~/.agents/skills/pw-playwright-fieldkit/assets/`.
 - The localhost regression suite is under the bundled `scripts/test/` directory.

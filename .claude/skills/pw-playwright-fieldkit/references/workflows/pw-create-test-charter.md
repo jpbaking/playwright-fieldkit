@@ -1,7 +1,7 @@
 # pw-create-test-charter — preserve QE intent before automating
 
 Use after a recording or before test generation. Copy
-`~/.agents/skills/pw-playwright-fieldkit/templates/journey.example.json` to a working
+`~/.agents/skills/pw-playwright-fieldkit/assets/journey.example.json` to a working
 file and fill it from the user's language and repository evidence.
 
 Capture: intent, business risk, persona/role, preconditions, observable outcomes,

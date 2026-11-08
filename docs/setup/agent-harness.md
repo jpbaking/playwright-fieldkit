@@ -2,8 +2,8 @@
 
 For workflow selection, return to the [User Guide](../user-guide.md).
 
-Playwright FieldKit is packaged as a portable Agent Skill for Antigravity CLI,
-Codex, Claude Code, Cline, and Pi. Its browser runtime, templates, and workflow
+Playwright FieldKit is packaged as a portable Agent Skill for Antigravity CLI, Codex, Claude Code, Gemini CLI, Cline, and OpenCode.
+Its browser runtime, assets, and workflow
 playbooks call no harness APIs.
 
 ## What is portable
@@ -11,12 +11,13 @@ playbooks call no harness APIs.
 | Part | Purpose | Harness dependency |
 |---|---|---|
 | `~/.agents/skills/pw-playwright-fieldkit/scripts/` | Deterministic browser and QE commands | None; ordinary Node.js |
-| `~/.agents/skills/pw-playwright-fieldkit/templates/` | Flows, charters, matrices, and test scaffolds | None |
+| `~/.agents/skills/pw-playwright-fieldkit/assets/` | Flows, charters, matrices, and test scaffolds | None |
 | `~/.agents/skills/pw-playwright-fieldkit/references/workflows/` | Canonical operating playbooks | None; Markdown |
 | `~/.agents/skills/pw-playwright-fieldkit/SKILL.md` | Intent router and safety contract | Skill-aware agents can load it directly; others can read it as instructions |
 | Shared rule body under `~/.agents/rules/` | Always-on activation hint | One marker-guarded pointer per selected host |
 
-`~/.agents/skills/` is Codex's user-global skills location and the single
+`~/.agents/skills/` is the user-global skills location for Codex, Gemini CLI,
+Cline, and OpenCode, and the single
 runtime home of the scripts (the byte-identical copies in the other
 harnesses' global skill directories exist for discovery and route script
 execution back to it). Keep the package there: the skill and examples
@@ -59,14 +60,15 @@ Use the standard portable repository layout:
 ```text
 AGENTS.md
 CLAUDE.md
+.gemini/settings.json
 .agents/skills/pw-playwright-fieldkit/
 .claude/skills/pw-playwright-fieldkit/
-.clinerules/workflows/pw-playwright-fieldkit.md
 ```
 
-Keep `.agents/skills/` authoritative, generate `.claude/skills/`
-byte-identically, and keep the Cline workflow file as a thin shim that only
-selects the skill. Put the activation rule in `AGENTS.md` once and make
+Keep `.agents/skills/` authoritative and generate `.claude/skills/`
+byte-identically. Cline exposes the skill natively as `/pw-playwright-fieldkit`,
+so no `.clinerules/workflows/` shim is needed; delete old ones. Make
+`.gemini/settings.json` list `AGENTS.md` in `context.fileName`. Put the activation rule in `AGENTS.md` once and make
 `CLAUDE.md` import it with `@AGENTS.md`. Do not duplicate the rule through
 host-native rules directories.
 

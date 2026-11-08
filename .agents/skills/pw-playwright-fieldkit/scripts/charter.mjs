@@ -10,7 +10,7 @@ const HELP = `charter.mjs — validate and render a QE journey charter
   node charter.mjs <journey.json> [--out report/journey]
 
 Required fields: title, intent, outcomes[]. Destructive journeys must declare
-at least one cleanup step. See ../templates/journey.example.json.`;
+at least one cleanup step. See ../assets/journey.example.json.`;
 
 function strings(value) {
   return Array.isArray(value) ? value.map(String).filter(Boolean) : [];

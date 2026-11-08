@@ -245,7 +245,7 @@ Allow: /private/public
     assert.equal(baseline.linkCheck.broken, 1, "broken linked asset was not reported");
 
     const charterSource = join(workDir, "journey-source.json");
-    writeFileSync(charterSource, readFileSync(resolve(SKILL_DIR, "templates", "journey.example.json"), "utf8").replace("https://staging.example.com/cart", `${origin}/flow.html`));
+    writeFileSync(charterSource, readFileSync(resolve(SKILL_DIR, "assets", "journey.example.json"), "utf8").replace("https://staging.example.com/cart", `${origin}/flow.html`));
     const charterDir = join(workDir, "journey");
     await run("charter.mjs", [charterSource, "--out", charterDir]);
     const charter = readJson(join(charterDir, "journey.json"));
@@ -253,7 +253,7 @@ Allow: /private/public
     assert.equal(charter.destructive, false);
 
     const testCaseSource = join(workDir, "test-cases-source.json");
-    const testCaseTemplate = readJson(resolve(SKILL_DIR, "templates", "test-cases.example.json"));
+    const testCaseTemplate = readJson(resolve(SKILL_DIR, "assets", "test-cases.example.json"));
     writeFileSync(testCaseSource, JSON.stringify(testCaseTemplate));
     const testCaseDir = join(workDir, "test-cases");
     await run("test-cases.mjs", [testCaseSource, "--out", testCaseDir]);
@@ -540,7 +540,7 @@ Allow: /private/public
     const reviewTestCasesWorkflow = readFileSync(resolve(SKILL_DIR, "references", "workflows", "pw-review-test-cases.md"), "utf8");
     const executeTestCaseWorkflow = readFileSync(resolve(SKILL_DIR, "references", "workflows", "pw-execute-test-case.md"), "utf8");
     const runAutomatedTestsWorkflow = readFileSync(resolve(SKILL_DIR, "references", "workflows", "pw-run-automated-tests.md"), "utf8");
-    const playwrightConfigTemplate = readFileSync(resolve(SKILL_DIR, "templates", "playwright.config.ts"), "utf8");
+    const playwrightConfigTemplate = readFileSync(resolve(SKILL_DIR, "assets", "playwright.config.ts"), "utf8");
     assert.match(rule, /activate the\s+`pw-playwright-fieldkit` skill/, "always-on rule omitted skill activation");
     assert(rule.includes("do not merely tell the user"), "always-on rule does not require workflow execution");
     assert(skillRouter.includes("pw-design-test-cases"), "skill router omitted feature-spec test design");

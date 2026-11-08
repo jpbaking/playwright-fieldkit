@@ -52,7 +52,7 @@ other core journeys.
 ## Step 3 — Write each journey as a flow
 
 Use one JSON file per journey. Follow
-`~/.agents/skills/pw-playwright-fieldkit/templates/flow.example.json` and prefer stable
+`~/.agents/skills/pw-playwright-fieldkit/assets/flow.example.json` and prefer stable
 locators such as `data-testid`, `name`, visible text, or roles. The crawl
 report's `selectorHint` fields provide candidates.
 

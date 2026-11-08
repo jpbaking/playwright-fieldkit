@@ -19,19 +19,31 @@ nothing is added to your repos. Paste this into your coding agent; it merges
 with existing global instruction files instead of colliding with them:
 
 ```
-Fetch https://raw.githubusercontent.com/jpbaking/playwright-fieldkit/main/AGENT-INSTALL.md and follow its instructions exactly to install Playwright FieldKit. Merge with — never blindly overwrite — any existing global instruction files, and report every file you created or changed.
+Install Playwright FieldKit. Using git with my existing credentials (do not
+download raw files or archives), clone
+https://github.com/jpbaking/playwright-fieldkit with --depth 1 into a new
+temporary directory outside any project. Then read AGENT-INSTALL.md from that
+clone and follow it exactly. Merge with—never blindly overwrite—any existing
+global instruction files, ask me which harnesses to install for, and report
+every file you created or changed.
 ```
 
-The agent acquires the sources itself (`git clone`, repo zip, or `gh`) and
-installs the canonical package to `~/.agents/skills/pw-playwright-fieldkit/`
-(Codex and Pi discovery plus the single runtime home of the scripts) with
-byte-identical copies in `~/.claude/skills/` (Claude Code),
-`~/.gemini/antigravity-cli/skills/` (Antigravity CLI), and
-`~/.cline/skills/` (Cline). The activation rule is stored once under
-`~/.agents/rules/` and referenced from each selected host's global instruction
-file. The install is per-user and per-machine
-(the `scripts/node_modules` browser runtime is per-machine anyway); re-run
-it anytime to update. Keep unrelated rules and instructions already present.
+Without a tag, the prompt installs the default branch as it is at clone time;
+add `at tag vX.Y.Z` (cloned with `--branch vX.Y.Z`) to pin a release. On a
+fork, mirror, or enterprise host, substitute the remote you clone from.
+
+**What the prompt does:** your agent clones this repository with your own git
+credentials and executes [AGENT-INSTALL.md](../../AGENT-INSTALL.md), the authoritative
+install contract. It installs the package to
+`~/.agents/skills/pw-playwright-fieldkit/` (Codex, Gemini CLI, Cline, and
+OpenCode discovery, plus the single scripts runtime — always installed), with
+byte-identical copies in `~/.claude/skills/` (Claude Code) and
+`~/.gemini/antigravity-cli/skills/` (Antigravity CLI) when selected. It stores
+the activation rule once at `~/.agents/rules/pw-playwright-fieldkit.md` and
+adds a marker-guarded pointer to each selected host's global instruction
+file. It writes nowhere else, and nothing is added to your repos. The install
+is per-user and per-machine; re-run it anytime to update, and the contract
+also covers uninstall.
 
 Then:
 
@@ -82,7 +94,7 @@ For an `@playwright/test` suite:
 cd /path/to/your/app
 npm install -D @playwright/test
 npx playwright install chromium
-# copy ~/.agents/skills/pw-playwright-fieldkit/templates/playwright.config.ts to your project root, set baseURL
+# copy ~/.agents/skills/pw-playwright-fieldkit/assets/playwright.config.ts to your project root, set baseURL
 npx playwright test --trace on
 ```
 

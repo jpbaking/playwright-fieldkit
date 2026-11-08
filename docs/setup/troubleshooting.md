@@ -146,7 +146,7 @@ recordings. Delete unreviewed drafts and HAR/auth artifacts when no longer neede
 **The generated `.spec.ts`/`.spec.js` won't run.**
 - Install the runner in your app project: `npm install -D @playwright/test`.
 - Set `baseURL` in `playwright.config.ts` (copy from
-  `~/.agents/skills/pw-playwright-fieldkit/templates/`), or make the `goto` paths
+  `~/.agents/skills/pw-playwright-fieldkit/assets/`), or make the `goto` paths
   absolute.
 
 **The generated test passes as a flow but fails in the project runner.**

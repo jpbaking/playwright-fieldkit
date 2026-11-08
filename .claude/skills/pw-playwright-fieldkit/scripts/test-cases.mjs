@@ -20,7 +20,7 @@ case under <out>/flows/; flow.mjs refuses to run a skeleton until every step
 is translated into a supported action.
 Approval binds to content: an approved document must carry review.approvedHash
 equal to the contentHash reported by this validator.
-See ../templates/test-cases.example.json.`;
+See ../assets/test-cases.example.json.`;
 
 const TYPES = new Set(["positive", "negative", "boundary", "permission", "accessibility", "recovery", "compatibility"]);
 const PRIORITIES = new Set(["low", "medium", "high", "critical"]);

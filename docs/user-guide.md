@@ -18,7 +18,8 @@ matching workflow while you provide product judgment and review its evidence.
 4. Let the agent follow the workflow, then review the requested decisions and
    evidence. Browser workflows never require you to assemble CLI commands.
 
-Antigravity CLI, Codex, Claude Code, Cline, and Pi use the same portable
+Antigravity CLI, Codex, Claude Code, Gemini CLI, Cline, and OpenCode use the same
+portable
 package through the [Agent Harness Guide](setup/agent-harness.md).
 The [CLI Reference](reference/cli.md) is supporting detail for agents and
 maintainers who need command flags, JSON formats, or output contracts; it is not

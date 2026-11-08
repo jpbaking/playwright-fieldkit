@@ -19,7 +19,7 @@
 //   --wait <ms>          settle time after each step        (default 500)
 //   --help
 //
-// Flow file shape (see ../templates/flow.example.json):
+// Flow file shape (see ../assets/flow.example.json):
 //   { "name": "...", "baseUrl": "https://...", "steps": [ {action}, ... ] }
 // Each step is one object with exactly one action key:
 //   {"goto":"/path"} {"click":"selector"} {"fill":"sel","value":"x"}
@@ -52,7 +52,7 @@ const HELP = `flow.mjs — run a JSON user journey, capture each step, optionall
   Actions include goto/click/fill/type/select/check/press/hover/scrollTo,
   waits, expectText/expectUrl/expectVisible/expectNotVisible/expectValue/
   expectCount, mockResponse/mockAbort, auditA11y, and screenshots.
-  See ../templates/flow.example.json.`;
+  See ../assets/flow.example.json.`;
 
 async function main() {
   const args = parseArgs();
